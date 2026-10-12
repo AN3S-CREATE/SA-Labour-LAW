@@ -1,0 +1,198 @@
+# CCMA Corpus Engine -- operator source allow-list.
+#
+# `status` records what was measured on the live web with the production
+# crawler (http.Fetcher, identified User-Agent), never what we wish were true.
+# A live source is fetched only when ALL of these hold:
+#   status: verified_open  AND  enabled: true  AND  operator_confirmed: true
+#   AND the run passes --allow-network and --popia-ack.
+#
+# `operator_confirmed` is false on every award source until the operator
+# answers the allow-list question (spec P0 b). Flip it per source; never in
+# bulk. `pending_robots_check` confirms a source on condition that robots.txt
+# permits every allow-listed path; each run re-checks that before its first
+# request.
+#
+# Blocked and dropped sources stay listed so every report can state what is
+# missing and why (D-003). Full evidence: docs/ccma-source-map.md.
+
+version: 1
+
+sources:
+
+  # --- Layer 1: official publications (never awards) -------------------------
+  # Operator instruction, 2026-09-23. `kind` is the source type; `record_kind`
+  # is what each record is seeded as: practice_note or statute, never award.
+  # Fetched by plain HTTP GET only (harvest_mode allowlisted_http), confined to
+  # the hosts AND allowed_paths below. Robots/ToS notes live in
+  # docs/ccma-source-map.md and must exist before any fetch (checked in code).
+  # A path ending in "/" admits everything below it; any other path is exact.
+  - id: ccma_official_publications
+    name: CCMA - information sheets, advice pages, published Rules and forms
+    kind: official_publication
+    record_kind: practice_note
+    harvest_mode: allowlisted_http
+    base_url: https://www.ccma.org.za/advicecategories/information-sheets/
+    hosts: [www.ccma.org.za]
+    allowed_paths:
+      - /advicecategories/information-sheets/
+      - /advices/
+      - /wp-content/uploads/
+    listing_urls:
+      - https://www.ccma.org.za/advicecategories/information-sheets/
+    detail_paths: [/advices/]
+    # Records are PDFs under the uploads path. Exact Rules/forms PDF URLs may be
+    # added under `urls:`; none are guessed.
+    link_patterns: ['^/wp-content/uploads/.+\.pdf$']
+    status: blocked_bot_management
+    robots_ok: false
+    verified_on: 2026-09-23
+    operator_confirmed: pending_robots_check
+    # Disabled under operator rule 2: robots.txt refused (see tos_notes).
+    enabled: false
+    min_delay: 8.0
+    max_delay: 15.0
+    tos_notes: >-
+      Official CCMA site (statutory body, LRA s112). Guidance published for the
+      public; stored locally for research, not republished. Terms of use not
+      reviewed (the host refuses this crawler). Robots check 2026-09-23T02:33Z
+      with the production client: /robots.txt answers HTTP 403 (bot refusal),
+      so all three allow-listed paths are refused (D-004). Disabled per rule 2.
+      Nothing else was requested. No login, CAPTCHA, WAF bypass, browser or
+      identity change (D-001, D-012). Route: request research access from the
+      CCMA; re-enable only after robots.txt permits these paths.
+
+  - id: govza_dismissal_code_2025
+    name: Code of Good Practice Dismissal 2025 (GN 3470 / GG 53294)
+    kind: official_publication
+    record_kind: statute
+    harvest_mode: allowlisted_http
+    base_url: https://www.gov.za/sites/default/files/gcis_document/202509/53294gen3470.pdf
+    hosts: [www.gov.za]
+    allowed_paths:
+      - /sites/default/files/gcis_document/202509/53294gen3470.pdf
+    urls:
+      - https://www.gov.za/sites/default/files/gcis_document/202509/53294gen3470.pdf
+    # The operator's label. Its GN/GG numbers are checked against the PDF text.
+    title: Code of Good Practice Dismissal 2025 (GN 3470 / GG 53294)
+    status: verified_open
+    robots_ok: true
+    verified_on: 2026-09-23
+    operator_confirmed: pending_robots_check
+    enabled: true
+    min_delay: 2.0
+    max_delay: 4.0
+    tos_notes: >-
+      SA Government portal (GCIS). Gazette notice: no copyright subsists in
+      official texts of a legislative, administrative or legal nature (Copyright
+      Act 98 of 1978 s12(8)(a)). The Government Gazette is the authoritative
+      text; this is a research copy. gov.za terms page not reviewed. Robots
+      check 2026-09-23T02:33Z with the production client: /robots.txt HTTP 200,
+      standard Drupal rules for User-agent *; no rule covers
+      /sites/default/files/, no Crawl-delay, no Content-Signal. Path allowed.
+
+  # --- Published CCMA awards ---------------------------------------------
+  - id: saflii_zaccma
+    name: SAFLII - South Africa, Commission for Conciliation, Mediation and Arbitration
+    kind: saflii_year_index
+    record_kind: award
+    base_url: https://www.saflii.org/za/cases/ZACCMA/
+    hosts: [www.saflii.org]
+    status: blocked_bot_management
+    robots_ok: false
+    verified_on: 2026-09-23
+    enabled: true
+    operator_confirmed: false
+    min_delay: 5.0
+    max_delay: 10.0
+    tos_notes: >-
+      Official Legal Information Institute collection of published CCMA awards
+      (a small selected subset, not the CCMA archive). 2026-09-23: /robots.txt
+      and /za/cases/ZACCMA/ both answer HTTP 403 with a Cloudflare managed
+      challenge ("Just a moment...") to the identified crawler. Not fetched
+      (D-001). Route: request research access from SAFLII.
+
+  # --- CCMA official site: rules, info sheets, forms (not awards) --------
+  - id: ccma_official_resources
+    name: CCMA - resources, rules and information sheets
+    kind: link_index
+    record_kind: practice_material
+    base_url: https://www.ccma.org.za/ccma-resources/
+    hosts: [www.ccma.org.za]
+    link_patterns: ['\.pdf$']
+    status: blocked_bot_management
+    robots_ok: false
+    verified_on: 2026-09-23
+    enabled: true
+    operator_confirmed: false
+    min_delay: 8.0
+    max_delay: 15.0
+    tos_notes: >-
+      Official CCMA site. Publishes rules, guidelines, information sheets and
+      forms; does not publish its award archive. 2026-09-23: every path
+      including /robots.txt answers HTTP 403 (Azure Application Gateway bot
+      refusal) to the identified crawler. It served the same crawler until
+      2026-09-20 (D-012), so access is conditional. Not fetched; no identity
+      change or evasion (D-001). Route: request research access from the CCMA.
+
+  # --- Candidates checked and excluded ------------------------------------
+  - id: lawlibrary_za
+    name: Laws.Africa Law Library (lawlibrary.org.za)
+    kind: link_index
+    record_kind: award
+    base_url: https://lawlibrary.org.za/
+    hosts: [lawlibrary.org.za]
+    status: content_signal_opt_out
+    robots_ok: false
+    verified_on: 2026-09-23
+    enabled: false
+    tos_notes: >-
+      robots.txt declares Content-Signal ai-input=no for User-agent * and
+      disallows /judgments/. Honoured (D-002). Route: data agreement.
+
+  - id: labourguide_caselaw
+    name: Labour Guide case-law database (caselaw.labourguide.co.za)
+    kind: link_index
+    record_kind: award
+    base_url: https://caselaw.labourguide.co.za/
+    hosts: [caselaw.labourguide.co.za]
+    status: dropped_unofficial
+    enabled: false
+    tos_notes: >-
+      Private commercial publisher, not an official source. Out of scope under
+      the spec's official-sources-only rule. Not probed.
+
+  - id: ccma_cmsonline
+    name: CCMA Online case-management portal (cmsonline.ccma.org.za)
+    kind: link_index
+    record_kind: award
+    base_url: https://cmsonline.ccma.org.za/
+    hosts: [cmsonline.ccma.org.za]
+    status: dropped_not_a_publication
+    enabled: false
+    tos_notes: >-
+      Referral and case-management system for parties. Not a publication of
+      awards; parties' case data is not ours to collect. Never fetched.
+
+  # --- Local sources (no network) -------------------------------------------
+  - id: local_corpus
+    name: Main labour corpus already on disk (data/corpus)
+    kind: local_corpus
+    record_kind: related_authority
+    path: data/corpus
+    status: local
+    enabled: true
+    tos_notes: >-
+      Judgments and CCMA material already collected by the main corpus under its
+      own policy. Labour Court / LAC judgments enter as related_authority, never
+      as awards. Processing full text still requires --popia-ack.
+
+  - id: operator_inbox
+    name: Awards the operator already lawfully holds (data/ccma/inbox)
+    kind: local_directory
+    record_kind: award
+    path: data/ccma/inbox
+    status: local
+    enabled: true
+    tos_notes: >-
+      Operator-supplied files; the operator is responsible for the right to hold
+      and process them. Stored with provenance operator_supplied.

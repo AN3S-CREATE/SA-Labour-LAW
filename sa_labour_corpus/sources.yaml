@@ -1,0 +1,511 @@
+# Source registry for the South African labour-law corpus.
+#
+# Every entry is a public host. Paid legal publishers (Juta, LexisNexis,
+# Sabinet, SALLR and the like) are a hard error, not an option -- see
+# tests/test_sources_yaml.py, which fails the build if one ever appears here.
+#
+# "access" records what was actually observed on the live web, not what we
+# wish were true:
+#   open                   - an honestly identified crawler is served content
+#   bot_management_blocked - the host refuses any self-identifying crawler
+#   content_signal_opt_out - the host expressly reserves rights against AI input
+#
+# Verified by live check on 2026-09-17 from a South African research context.
+
+version: 1
+
+defaults:
+  jurisdiction: ZA
+  min_delay: 1.0
+  max_delay: 2.0
+
+sources:
+
+  # ---------------------------------------------------------------------
+  # Legislation and codes -- Department of Employment and Labour
+  # ---------------------------------------------------------------------
+  # The Department publishes documents through a SharePoint "Document Centre".
+  # Each category page lists folders, and each folder page lists the PDFs. Both
+  # levels are reachable over plain HTTP by an identified crawler, so no browser
+  # is needed. Paths verified live on 2026-09-17; the older /Legislation/* paths
+  # in circulation are HTTP 404.
+  - id: del_legislation
+    name: Department of Employment and Labour - Acts and amendments
+    host: www.labour.gov.za
+    base_url: https://www.labour.gov.za/DocumentCenter/Pages/Acts.aspx
+    forum: DEL
+    doc_type: statute
+    kind: link_index
+    access: open
+    enabled: true
+    link_patterns:
+      - '/DocumentCenter/'
+    license_note: >-
+      Republic of South Africa legislation. Public domain in substance;
+      confirm against the Government Gazette before relying on any text.
+
+  - id: del_codes_of_good_practice
+    name: Department of Employment and Labour - Codes of Good Practice
+    host: www.labour.gov.za
+    base_url: https://www.labour.gov.za/DocumentCenter/Pages/Code-of-Good-Practice.aspx
+    forum: DEL
+    doc_type: code_of_good_practice
+    kind: link_index
+    access: open
+    enabled: true
+    link_patterns:
+      - '/DocumentCenter/'
+    notes: >-
+      The consolidated Code of Good Practice on Dismissal took effect on
+      4 September 2025 (GG 53294, GN 3470) and replaced the former Schedule 8
+      and the operational-requirements code. Treat it as current unless a later
+      gazette supersedes it; the parser flags any instrument that appears to
+      supersede it.
+    license_note: >-
+      Republic of South Africa. Confirm against the Government Gazette.
+
+  - id: del_regulations
+    name: Department of Employment and Labour - Regulations
+    host: www.labour.gov.za
+    base_url: https://www.labour.gov.za/DocumentCenter/Pages/Regulations.aspx
+    forum: DEL
+    doc_type: regulation
+    kind: link_index
+    access: open
+    enabled: true
+    link_patterns:
+      - '/DocumentCenter/'
+    license_note: >-
+      Republic of South Africa. Confirm against the Government Gazette.
+
+  - id: del_sectoral_determinations
+    name: Department of Employment and Labour - Sectoral determinations
+    host: www.labour.gov.za
+    base_url: https://www.labour.gov.za/DocumentCenter/Pages/Sectoral.aspx
+    forum: DEL
+    doc_type: regulation
+    kind: link_index
+    access: open
+    enabled: true
+    link_patterns:
+      - '/DocumentCenter/'
+    license_note: >-
+      Republic of South Africa. Confirm against the Government Gazette.
+
+  - id: del_forms
+    name: Department of Employment and Labour - Forms
+    host: www.labour.gov.za
+    base_url: https://www.labour.gov.za/DocumentCenter/Pages/Forms.aspx
+    forum: DEL
+    doc_type: form
+    kind: link_index
+    access: open
+    enabled: true
+    link_patterns:
+      - '/DocumentCenter/'
+    license_note: Republic of South Africa public forms.
+
+  # ---------------------------------------------------------------------
+  # Government-wide document portal
+  # ---------------------------------------------------------------------
+  - id: govza_labour_documents
+    name: gov.za - labour documents and notices
+    host: www.gov.za
+    base_url: https://www.gov.za/documents
+    forum: GPW
+    doc_type: gazette
+    kind: link_index
+    access: open
+    enabled: true
+    # No query_terms: gov.za ignores a ?search= parameter on /documents and
+    # returns the default newest-first listing regardless, so a term-based
+    # sweep is not possible here. Verified 2026-09-17.
+    link_patterns:
+      - '/documents/'
+      - '\.pdf$'
+    license_note: >-
+      Republic of South Africa. Gazette text is authoritative only in the
+      Government Gazette itself.
+
+  # gov.za publishes a national Acts listing, newest first, paginated with
+  # ?page=N. Older labour statutes that the Department's own library does not
+  # carry as standalone PDFs -- the National Minimum Wage Act and the Protected
+  # Disclosures Act among them -- are reachable by walking it.
+  #
+  # Two bounds keep this proportionate: max_pages limits how far back we walk,
+  # and title_filter keeps every unrelated national statute out. Verified
+  # 2026-09-17: page 0 covers 2024-2026, page 5 covers 2018-2020, page 20
+  # covers 2005-2006.
+  - id: govza_acts
+    name: gov.za - national Acts listing (labour-filtered)
+    host: www.gov.za
+    base_url: https://www.gov.za/documents/acts
+    forum: GPW
+    doc_type: statute
+    kind: link_index
+    access: open
+    enabled: true
+    max_pages: 32
+    page_param: page
+    title_filter: >-
+      minimum wage|protected disclosure|labour relations|basic conditions of
+      employment|employment equity|unemployment insurance|compensation for
+      occupational|occupational health and safety|skills development|
+      mine health and safety|employment services|labour appeal
+    link_patterns:
+      - '/documents/acts/'
+      - '\.pdf$'
+    license_note: >-
+      Republic of South Africa. The Government Gazette remains the only
+      authoritative text; confirm before relying on any provision.
+
+  - id: gpw_gazettes
+    name: Government Printing Works - gazettes
+    host: www.gpwonline.co.za
+    base_url: https://www.gpwonline.co.za/Gazettes/Pages/Published-National-Government-Gazettes.aspx
+    forum: GPW
+    doc_type: gazette
+    kind: link_index
+    access: open
+    enabled: false
+    notes: >-
+      Reachable by an identified crawler and publishes no robots.txt, but the
+      gazette archive is paginated per publication date and a full sweep is a
+      large crawl. Disabled by default; enable deliberately with --sources.
+    license_note: Republic of South Africa, Government Printing Works.
+
+  # ---------------------------------------------------------------------
+  # Mining
+  # ---------------------------------------------------------------------
+  # The MHSC site root links to section pages but carries no documents itself.
+  # The promulgated codes and guidelines page is where the instruments live:
+  # verified 2026-09-20, 20 documents including guidelines on fire prevention,
+  # change management and GBVF in mining. /legislation/ and /publications/
+  # carry no direct document links.
+  - id: mhsc_codes_of_practice
+    name: Mine Health and Safety Council - codes of practice and guidelines
+    host: mhsc.org.za
+    base_url: https://mhsc.org.za/code-of-practice-promulgated-guidelines/
+    forum: MHSC
+    doc_type: guideline
+    kind: link_index
+    access: open
+    enabled: true
+    link_patterns:
+      - '\.pdf$'
+    license_note: >-
+      Mine Health and Safety Council public material. Statutory force derives
+      from the Mine Health and Safety Act 29 of 1996, not from this website.
+
+  - id: mhsc_public
+    name: Mine Health and Safety Council - site sections
+    host: mhsc.org.za
+    base_url: https://mhsc.org.za/
+    forum: MHSC
+    doc_type: guideline
+    kind: link_index
+    access: open
+    enabled: false
+    notes: >-
+      Disabled: the site root yields no documents, only section pages. Use
+      mhsc_codes_of_practice instead. Re-enable only if the site gains a
+      document index at the root.
+    license_note: >-
+      Mine Health and Safety Council public material.
+
+  # ---------------------------------------------------------------------
+  # Case law -- SAFLII
+  # ---------------------------------------------------------------------
+  # SAFLII is the highest-value free case-law source in South Africa, and it
+  # is registered here so that the crawler attempts it honestly, records the
+  # refusal, and reports the resulting gap. On 2026-09-17 every plain HTTP
+  # request to www.saflii.org -- including /robots.txt itself -- returned
+  # HTTP 403 with a Cloudflare managed-challenge interstitial, for both an
+  # identified crawler UA and an ordinary browser UA.
+  #
+  # Reaching this content would require presenting as something other than an
+  # automated client in order to defeat a deliberately configured access
+  # control. That is out of scope by design. See COVERAGE.md for the lawful
+  # acquisition paths.
+  - id: saflii_zalcjhb
+    name: SAFLII - Labour Court, Johannesburg
+    host: www.saflii.org
+    base_url: https://www.saflii.org/za/cases/ZALCJHB/
+    forum: ZALCJHB
+    doc_type: judgment
+    kind: year_index
+    access: bot_management_blocked
+    enabled: true
+    license_note: >-
+      SAFLII publishes judgments for free access. Local copies are for private
+      research use; confirm every citation against the original file.
+
+  - id: saflii_zalcct
+    name: SAFLII - Labour Court, Cape Town
+    host: www.saflii.org
+    base_url: https://www.saflii.org/za/cases/ZALCCT/
+    forum: ZALCCT
+    doc_type: judgment
+    kind: year_index
+    access: bot_management_blocked
+    enabled: true
+    license_note: SAFLII free-access case law; confirm against the original file.
+
+  - id: saflii_zalcd
+    name: SAFLII - Labour Court, Durban
+    host: www.saflii.org
+    base_url: https://www.saflii.org/za/cases/ZALCD/
+    forum: ZALCD
+    doc_type: judgment
+    kind: year_index
+    access: bot_management_blocked
+    enabled: true
+    license_note: SAFLII free-access case law; confirm against the original file.
+
+  - id: saflii_zalcpe
+    name: SAFLII - Labour Court, Port Elizabeth / Gqeberha
+    host: www.saflii.org
+    base_url: https://www.saflii.org/za/cases/ZALCPE/
+    forum: ZALCPE
+    doc_type: judgment
+    kind: year_index
+    access: bot_management_blocked
+    enabled: true
+    notes: >-
+      Seat database existence must be confirmed on the live index; if the
+      database is absent the crawler records a 404 gap rather than inventing
+      a source.
+    license_note: SAFLII free-access case law; confirm against the original file.
+
+  - id: saflii_zalac
+    name: SAFLII - Labour Appeal Court
+    host: www.saflii.org
+    base_url: https://www.saflii.org/za/cases/ZALAC/
+    forum: ZALAC
+    doc_type: judgment
+    kind: year_index
+    access: bot_management_blocked
+    enabled: true
+    license_note: SAFLII free-access case law; confirm against the original file.
+
+  - id: saflii_zacc
+    name: SAFLII - Constitutional Court (labour matters only)
+    host: www.saflii.org
+    base_url: https://www.saflii.org/za/cases/ZACC/
+    forum: ZACC
+    doc_type: judgment
+    kind: year_index
+    access: bot_management_blocked
+    enabled: true
+    filter_required: true
+    license_note: SAFLII free-access case law; confirm against the original file.
+
+  - id: saflii_zasca
+    name: SAFLII - Supreme Court of Appeal (labour-adjacent only)
+    host: www.saflii.org
+    base_url: https://www.saflii.org/za/cases/ZASCA/
+    forum: ZASCA
+    doc_type: judgment
+    kind: year_index
+    access: bot_management_blocked
+    enabled: true
+    filter_required: true
+    license_note: SAFLII free-access case law; confirm against the original file.
+
+  - id: saflii_zaccma
+    name: SAFLII - CCMA published awards (a small subset)
+    host: www.saflii.org
+    base_url: https://www.saflii.org/za/cases/ZACCMA/
+    forum: ZACCMA
+    doc_type: award
+    kind: year_index
+    access: bot_management_blocked
+    enabled: true
+    notes: >-
+      This database holds on the order of tens of published awards. It is not
+      the national CCMA award archive and must never be described as such.
+    license_note: SAFLII free-access case law; confirm against the original file.
+
+  - id: saflii_legislation
+    name: SAFLII - consolidated Acts
+    host: www.saflii.org
+    base_url: https://www.saflii.org/za/legis/consol_act/
+    forum: SAFLII_LEGIS
+    doc_type: statute
+    kind: link_index
+    access: bot_management_blocked
+    enabled: true
+    license_note: >-
+      SAFLII consolidated legislation. Not the authoritative text; confirm
+      against the Government Gazette.
+
+  # ---------------------------------------------------------------------
+  # CCMA
+  # ---------------------------------------------------------------------
+  # Access here is CONDITIONAL and has changed twice under observation.
+  #
+  #   2026-09-17  recorded as blocked. That measurement was wrong: it used a
+  #               bare token user-agent this crawler never sends.
+  #   2026-09-18  the production user-agent was served HTTP 200 with real
+  #               content across /, /resources/ and /about-us/; robots.txt was
+  #               HTTP 404. ~78 documents were collected successfully.
+  #   2026-09-20  after that sustained access the gateway returns HTTP 403 for
+  #               EVERY path, including / and /robots.txt, to the same
+  #               user-agent over a fully verified TLS chain.
+  #
+  # The most likely reading is a rate or reputation response by the WAF, which
+  # is the control working as intended. The crawler trips the host and records
+  # the gap, and nothing here attempts to evade it -- no user-agent rotation,
+  # no slower-but-quieter crawling to stay under a threshold. That would be
+  # circumvention with extra steps.
+  #
+  # The delays below are deliberately far longer than any other source, so that
+  # if access returns a future run is gentler than the one that lost it. The
+  # durable fix is permission: ask the CCMA for research access.
+  #
+  # What has not changed: the CCMA publishes rules, guidance and forms here,
+  # NOT its award archive.
+  - id: ccma_referral_forms
+    name: CCMA - referral and application forms
+    host: www.ccma.org.za
+    base_url: https://www.ccma.org.za/advicecategories/ccma-referral-forms/
+    forum: CCMA_PUBLIC
+    doc_type: form
+    kind: link_index
+    access: open
+    min_delay: 8.0
+    max_delay: 15.0
+    enabled: true
+    link_patterns:
+      - '\.pdf$'
+    license_note: >-
+      CCMA public material. The CCMA does not publish a bulk award API; this
+      site carries rules, guidance and forms, not the award archive.
+
+  - id: ccma_information_sheets
+    name: CCMA - information sheets and guidance
+    host: www.ccma.org.za
+    base_url: https://www.ccma.org.za/advicecategories/information-sheets/
+    forum: CCMA_PUBLIC
+    doc_type: guideline
+    kind: link_index
+    access: open
+    min_delay: 8.0
+    max_delay: 15.0
+    enabled: true
+    link_patterns:
+      - '\.pdf$'
+    license_note: >-
+      CCMA public guidance. Not the award archive.
+
+  - id: ccma_resources
+    name: CCMA - resources, rules and publications
+    host: www.ccma.org.za
+    base_url: https://www.ccma.org.za/ccma-resources/
+    forum: CCMA_PUBLIC
+    doc_type: ccma_rule
+    kind: link_index
+    access: open
+    min_delay: 8.0
+    max_delay: 15.0
+    enabled: true
+    link_patterns:
+      - '\.pdf$'
+      - '/advicecategories/'
+      - 'rule'
+    license_note: >-
+      CCMA public material. Rules and guidance only; individual arbitration
+      awards are not published here.
+
+  # ---------------------------------------------------------------------
+  # Bargaining councils
+  # ---------------------------------------------------------------------
+  # Councils hold s191 dismissal jurisdiction in their registered scope, so
+  # their constitutions and main agreements bear directly on an unfair-dismissal
+  # analysis. Each council runs its own site, so each was checked individually
+  # on 2026-09-18 rather than assumed:
+  #
+  #   mibco.org.za    robots: "User-agent: * / Disallow:" (allow all) + sitemap
+  #   nbcrfli.org.za  robots: "Allow: /", blocks /admin, /api, /flipbook only
+  #   bccei.co.za     robots: blocks /wp-admin only, + sitemap
+  #
+  # All three serve the identified crawler HTTP 200. MEIBC (meibc.co.za) is a
+  # JavaScript-rendered Next.js site that publishes no robots.txt; it is not
+  # registered until its document routes are confirmed reachable without a
+  # browser.
+  - id: bc_mibco
+    name: "MIBCO - Motor Industry Bargaining Council"
+    host: www.mibco.org.za
+    base_url: https://www.mibco.org.za/collective-agreements/
+    forum: "BC:MIBCO"
+    doc_type: bargaining_council_agreement
+    kind: link_index
+    access: open
+    enabled: true
+    link_patterns:
+      - '\.pdf$'
+      - 'constitution'
+      - 'agreement'
+    license_note: >-
+      MIBCO public material. A council agreement is binding only as extended by
+      the Minister and gazetted; confirm scope and currency before relying on it.
+
+  - id: bc_nbcrfli
+    name: "NBCRFLI - Road Freight and Logistics Bargaining Council"
+    host: www.nbcrfli.org.za
+    base_url: https://www.nbcrfli.org.za/collective-agreements
+    forum: "BC:NBCRFLI"
+    doc_type: bargaining_council_agreement
+    kind: link_index
+    access: open
+    enabled: true
+    link_patterns:
+      - '\.pdf$'
+      - '/collective-agreements'
+      - 'constitution'
+    license_note: >-
+      NBCRFLI public material. Confirm scope and currency against the gazetted
+      extension before relying on it.
+
+  - id: bc_bccei
+    name: "BCCEI - Civil Engineering Industry Bargaining Council"
+    host: bccei.co.za
+    base_url: https://bccei.co.za/about-us/documents/
+    forum: "BC:BCCEI"
+    doc_type: bargaining_council_agreement
+    kind: link_index
+    access: open
+    enabled: true
+    link_patterns:
+      - '\.pdf$'
+      - 'agreement'
+      - 'constitution'
+    license_note: >-
+      BCCEI public material. Confirm scope and currency against the gazetted
+      extension before relying on it.
+
+  # ---------------------------------------------------------------------
+  # Excluded by express reservation of rights
+  # ---------------------------------------------------------------------
+  # lawlibrary.org.za (Laws.Africa) is free to read and is the best-structured
+  # open SA legal corpus. Its robots.txt sets, for User-agent: *,
+  #   Content-Signal: ai-train=no, search=yes, ai-input=no
+  # and disallows /judgments/ and /akn/za/judgment/. "ai-input" covers
+  # retrieval-augmented generation and grounding, which is exactly this
+  # corpus's purpose, and the file frames the restriction as an express
+  # reservation of rights. It is therefore excluded by default rather than
+  # crawled. Named search agents are granted ai-input=yes; this crawler is not
+  # one of them. Seek permission or a data agreement to enable it.
+  - id: lawsafrica_lawlibrary
+    name: Laws.Africa / LawLibrary South Africa
+    host: lawlibrary.org.za
+    base_url: https://lawlibrary.org.za/
+    forum: LAWSAFRICA
+    doc_type: statute
+    kind: link_index
+    access: content_signal_opt_out
+    enabled: false
+    license_note: >-
+      Laws.Africa publishes under CC-BY, but the site's Content-Signal declares
+      ai-input=no for general crawlers. Excluded pending express permission or
+      a data agreement.

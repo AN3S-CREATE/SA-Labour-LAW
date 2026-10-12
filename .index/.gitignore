@@ -1,0 +1,2 @@
+# Nothing in .index/ is temporary. The index is committed so that context is
+# shared across sessions and collaborators (CONTEXT-INDEX-001 section 9).

@@ -1,0 +1,197 @@
+# Golden fact patterns for the Dismissal Navigator.
+#
+# Each case states facts and the outcome the navigator is expected to give.
+# The expectations were written by the navigator's author from LRA s186-s194
+# and EEA s10 as held in this corpus. They are NOT yet signed off by a
+# practising labour lawyer. Until a case carries `reviewed_by` and
+# `reviewed_on`, treat its expectation as the author's reading, not as law.
+#
+# Produce the review sheet a lawyer signs:
+#   labour-corpus navigate review-sheet > navigator-review.md
+#
+# Expectation keys (all optional except track):
+#   track                 arbitration | labour_court | election | eea_labour_court
+#   classification_has    substring of the classification label
+#   due                   list of due dates, one per deadline ("pending" = not started)
+#   status                list of deadline statuses, one per deadline
+#   route                 provision keys of the route steps, in order
+#   remedy                provision key of the remedy ceiling (null = none)
+#   onus                  true if LRA s192(2) applies
+#   forum_has             substring of the first route step's forum
+#   warning_has           substring of some warning or deadline note
+
+review:
+  status: pending_lawyer_review
+  reviewer_instructions: >-
+    For each case, check the expected track, deadlines and route against the
+    LRA and EEA. Mark AGREE, or DISAGREE with the correct outcome and the
+    provision relied on. Do not assess fairness: the navigator does not.
+
+cases:
+  - id: conduct-open
+    as_of: 2026-10-07
+    facts: {reason: conduct, event_date: 2026-09-20}
+    expect: {track: arbitration, due: [2026-10-20], status: [open],
+             route: [lra_191_1_a, lra_191_5_a], remedy: lra_194_1, onus: true}
+
+  - id: conduct-internal-appeal-restarts-clock
+    as_of: 2026-10-07
+    facts: {reason: conduct, event_date: 2026-08-01, final_decision_date: 2026-09-25}
+    expect: {track: arbitration, due: [2026-10-25], status: [open]}
+
+  - id: conduct-late-needs-condonation
+    as_of: 2026-10-07
+    facts: {reason: conduct, event_date: 2026-08-15}
+    expect: {track: arbitration, due: [2026-09-14], status: [expired],
+             route: [lra_191_1_a, lra_191_2, lra_191_5_a]}
+
+  - id: conduct-due-in-seven-days
+    as_of: 2026-10-07
+    facts: {reason: conduct, event_date: 2026-09-14}
+    expect: {due: [2026-10-14], status: [due_soon], track: arbitration}
+
+  - id: conduct-deadline-on-a-saturday
+    as_of: 2026-10-07
+    facts: {reason: conduct, event_date: 2026-09-10}
+    expect: {due: [2026-10-10], track: arbitration, warning_has: "falls on a weekend"}
+
+  - id: capacity-ill-health
+    as_of: 2026-10-07
+    facts: {reason: capacity, event_date: 2026-09-30}
+    expect: {track: arbitration, classification_has: capacity, remedy: lra_194_1}
+
+  - id: capacity-probation-con-arb
+    as_of: 2026-10-07
+    facts: {reason: capacity, event_date: 2026-09-30, probation: true}
+    expect: {track: arbitration, route: [lra_191_1_a, lra_191_5_a, lra_191_5A]}
+
+  - id: no-reason-given
+    as_of: 2026-10-07
+    facts: {reason: unknown, event_date: 2026-09-30}
+    expect: {track: arbitration, route: [lra_191_1_a, lra_191_5_a]}
+
+  - id: retrenchment-large-employer-facts-unknown
+    as_of: 2026-10-07
+    facts: {reason: operational_requirements, event_date: 2026-09-30}
+    expect: {track: labour_court, due: [2026-10-30, pending], status: [open, not_started],
+             route: [lra_191_1_a, lra_191_5_b], warning_has: "s191(12)"}
+
+  - id: retrenchment-small-employer-election
+    as_of: 2026-10-07
+    facts: {reason: operational_requirements, event_date: 2026-09-30,
+            employer_has_fewer_than_10_employees: true}
+    expect: {track: election, route: [lra_191_1_a, lra_191_12]}
+
+  - id: retrenchment-only-this-employee-election
+    as_of: 2026-10-07
+    facts: {reason: operational_requirements, event_date: 2026-09-30,
+            employer_has_fewer_than_10_employees: false, only_this_employee_retrenched: true}
+    expect: {track: election}
+
+  - id: retrenchment-group-large-employer
+    as_of: 2026-10-07
+    facts: {reason: operational_requirements, event_date: 2026-09-30,
+            employer_has_fewer_than_10_employees: false, only_this_employee_retrenched: false}
+    expect: {track: labour_court, remedy: lra_194_1}
+
+  - id: retrenchment-certificate-issued
+    as_of: 2026-10-07
+    facts: {reason: operational_requirements, event_date: 2026-06-01,
+            certificate_date: 2026-08-01}
+    expect: {track: labour_court, due: [2026-07-01, 2026-10-30], status: [expired, open]}
+
+  - id: automatically-unfair-pregnancy
+    as_of: 2026-10-07
+    facts: {reason: automatically_unfair, auto_unfair_ground: e_pregnancy,
+            event_date: 2026-09-30}
+    expect: {track: labour_court, classification_has: pregnancy, due: [2026-10-30, pending],
+             remedy: lra_194_3, onus: true}
+
+  - id: automatically-unfair-protected-strike-late-at-labour-court
+    as_of: 2026-10-07
+    facts: {reason: automatically_unfair, auto_unfair_ground: a_protected_strike,
+            event_date: 2026-03-02, certificate_date: 2026-04-15}
+    expect: {track: labour_court, due: [2026-04-01, 2026-07-14], status: [expired, expired]}
+
+  - id: automatically-unfair-whistleblower
+    as_of: 2026-10-07
+    facts: {reason: automatically_unfair, auto_unfair_ground: h_protected_disclosure,
+            event_date: 2026-09-30}
+    expect: {track: labour_court, classification_has: protected disclosure, remedy: lra_194_3}
+
+  - id: automatically-unfair-discriminatory-dismissal-uses-lra
+    as_of: 2026-10-07
+    facts: {reason: automatically_unfair, auto_unfair_ground: f_discrimination,
+            event_date: 2026-09-30}
+    expect: {track: labour_court, due: [2026-10-30, pending],
+             route: [lra_191_1_a, lra_191_5_b]}
+
+  - id: constructive-dismissal
+    as_of: 2026-10-07
+    facts: {reason: constructive, event_date: 2026-09-30}
+    expect: {track: arbitration, route: [lra_191_1_a, lra_191_5_a], remedy: lra_194_1,
+             warning_has: "intolerable"}
+
+  - id: constructive-after-s197-transfer-alleged-automatically-unfair
+    as_of: 2026-10-07
+    facts: {reason: constructive, auto_unfair_ground: g_transfer_s197, event_date: 2026-09-30}
+    expect: {track: labour_court, remedy: lra_194_3}
+
+  - id: unprotected-strike
+    as_of: 2026-10-07
+    facts: {reason: unprotected_strike, event_date: 2026-09-30}
+    expect: {track: labour_court, route: [lra_191_1_a, lra_191_5_b], remedy: lra_194_1}
+
+  - id: closed-shop
+    as_of: 2026-10-07
+    facts: {reason: closed_shop, event_date: 2026-09-30}
+    expect: {track: labour_court}
+
+  - id: ulp-promotion
+    as_of: 2026-10-07
+    facts: {dispute: unfair_labour_practice, event_date: 2026-09-01}
+    expect: {track: arbitration, due: [2026-11-30], remedy: lra_194_4, onus: false,
+             route: [lra_191_1_a, lra_191_5_a, lra_191_13]}
+
+  - id: ulp-became-aware-later
+    as_of: 2026-10-07
+    facts: {dispute: unfair_labour_practice, event_date: 2026-03-01,
+            became_aware_date: 2026-08-01}
+    expect: {track: arbitration, due: [2026-10-30], status: [open]}
+
+  - id: ulp-late
+    as_of: 2026-10-07
+    facts: {dispute: unfair_labour_practice, event_date: 2026-05-01}
+    expect: {track: arbitration, due: [2026-07-30], status: [expired],
+             route: [lra_191_1_a, lra_191_2, lra_191_5_a, lra_191_13]}
+
+  - id: discrimination-not-dismissal
+    as_of: 2026-10-07
+    facts: {dispute: discrimination_not_dismissal, event_date: 2026-09-15}
+    expect: {track: eea_labour_court, due: [2027-03-15], remedy: null, onus: false,
+             forum_has: CCMA, route: [eea_10_2, eea_10_6_a]}
+
+  - id: discrimination-month-end-clipped
+    as_of: 2026-10-07
+    facts: {dispute: discrimination_not_dismissal, event_date: 2026-08-31}
+    expect: {track: eea_labour_court, due: [2027-02-28]}
+
+  - id: discrimination-leap-year
+    as_of: 2027-09-01
+    facts: {dispute: discrimination_not_dismissal, event_date: 2027-08-31}
+    expect: {track: eea_labour_court, due: [2028-02-29]}
+
+  - id: discrimination-late
+    as_of: 2026-10-07
+    facts: {dispute: discrimination_not_dismissal, event_date: 2026-03-01}
+    expect: {track: eea_labour_court, due: [2026-09-01], status: [expired], route: [eea_10_2, eea_10_3, eea_10_6_a]}
+
+  - id: council-named
+    as_of: 2026-10-07
+    facts: {reason: conduct, event_date: 2026-09-30, council: "yes", council_name: MIBCO}
+    expect: {track: arbitration, forum_has: MIBCO}
+
+  - id: no-council
+    as_of: 2026-10-07
+    facts: {reason: conduct, event_date: 2026-09-30, council: "no"}
+    expect: {track: arbitration, forum_has: CCMA}

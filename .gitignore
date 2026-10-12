@@ -1,0 +1,26 @@
+# Harvested corpus. Regenerate with `labour-corpus crawl`; do not commit bodies.
+data/
+**/inbox/*
+!**/inbox/README.md
+
+# CCMA engine runtime logs (regenerated each run; no secrets by test)
+sa_labour_corpus/logs/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
