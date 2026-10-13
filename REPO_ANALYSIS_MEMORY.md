@@ -336,7 +336,8 @@ bounded pagination; `query_terms` was dropped as unworkable.
   hosted CI run 38428505021 passed. A one-document-cap identified crawl of
   `bc_nbcrfli` with the operator-supplied contact produced one genuine 304,
   zero repeat 200 downloads and zero transferred document bytes; acceptance is
-  now 11/11. Pinned checkout/setup-python to the reviewed v4/v5 tag SHAs.
+  now 11/11. Pinned checkout/setup-python to the reviewed v4/v5 tag SHAs and
+  replaced the crawler User-Agent's placeholder URL with the confirmed remote.
 
 - [2026-10-13] Completed the safe outcome-label data refresh. A full 397-file
   parse exposed missing `antiword` in the new environment and would have

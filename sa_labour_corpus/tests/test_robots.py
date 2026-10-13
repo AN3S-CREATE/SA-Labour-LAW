@@ -525,6 +525,7 @@ def test_user_agent_always_identifies_the_crawler_and_operator():
     assert "SALabourCorpusBot" in agent
     assert "ops@example.test" in agent
     assert "research crawler" in agent
+    assert "https://github.com/AN3S-CREATE/SA-Labour-LAW" in agent
 
 
 def test_user_agent_requires_a_valid_contact_address():

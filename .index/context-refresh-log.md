@@ -478,6 +478,9 @@ Regenerated, and `search` now warns when the index predates the corpus (D-018).
 - Acceptance audit now passes 11/11 against the newly rotated run history.
 - Pinned `actions/checkout` v4 and `actions/setup-python` v5 to their resolved
   commit SHAs, retaining major-version comments for reviewed updates.
+- Replaced the crawler identity's placeholder project URL with the confirmed
+  `https://github.com/AN3S-CREATE/SA-Labour-LAW` remote and added a regression
+  assertion; future requests now carry both the real project and operator.
 - Practitioner sign-off of the 30 golden cases remains the sole release gate.
 
 ---

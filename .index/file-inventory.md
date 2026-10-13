@@ -44,7 +44,7 @@ integration).
 | Path | Purpose | Key symbols | Status |
 |---|---|---|---|
 | `cli.py` | Typer app: crawl, parse, index, search, report, ingest-inbox, sources, smoke; mounts `ccma` and `navigate`. No `from __future__ import annotations` (Typer evaluated string annotations on every invocation, ~1.2 s). `parse` has a D-008 document boundary and one OCR helper | `app`, `crawl`, `parse`, `_rebuild_from_transcription`, `smoke` | Active |
-| `config.py` | Paths, settings, crawler identity, paid-host guard | `build_user_agent`, `assert_not_paid_host`, `CorpusPaths`, `CrawlSettings` | Active |
+| `config.py` | Paths, fixed honest crawler identity linked to `AN3S-CREATE/SA-Labour-LAW`, operator contact validation, paid-host guard | `build_user_agent`, `assert_not_paid_host`, `CorpusPaths`, `CrawlSettings` | Active |
 | `models.py` | Pydantic document contract and enums; `Gap.kind` typed as `GapKind` | `ParsedDoc`, `DocType`, `Provenance`, `Outcome`, `Remedy`, `make_doc_id`, `Gap`, `GapKind` | Active |
 | `challenge.py` | Recognises bot-management interstitials. Never solves one | `looks_like_challenge`, `ChallengeDetected` | Active |
 | `robots.py` | robots.txt (RFC 9309), Crawl-delay, Content-Signal; every matching group applies, most restrictively; oversize and non-finite delays refuse (D-025) | `parse_robots`, `RobotsRules._matching_groups`, `_most_restrictive`, `ContentSignal` | Active |

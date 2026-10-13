@@ -16,7 +16,7 @@ from pathlib import Path
 
 PROJECT_NAME = "SALabourCorpusBot"
 PROJECT_VERSION = "0.1.0"
-PROJECT_URL = "https://github.com/operator/sa-labour-corpus"
+PROJECT_URL = "https://github.com/AN3S-CREATE/SA-Labour-LAW"
 
 # Hostnames that are paid legal publishers. Adding one of these as a crawl
 # target is a hard error, not a warning (spec section 14).
