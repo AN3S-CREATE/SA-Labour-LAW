@@ -96,7 +96,6 @@ and a title exclusion for Act copies (doc types are unreliable; dead-code.md).
 quote that was still present in a second copy); the engine was right each time.
 
 ---
-
 ## 2026-09-23 — Layer 1 official publications (D-021)
 
 **Scope.** `labour_corpus/ccma/`: allowlist, scrape, find, extract, harvest,
@@ -435,3 +434,20 @@ Regenerated, and `search` now warns when the index predates the corpus (D-018).
 **Verified final:** 397 documents, 397 readable, 4 drafts flagged, 1,613 tags,
 397 indexed, 245 tests green, 11/11 acceptance criteria via
 `tools/acceptance_audit.py`.
+# 2026-10-13 — Git/CI and post-review completion refresh
+
+- Initialized Git on `main`; committed reviewed baseline `b723a26`.
+- Added Python 3.11/3.13 CI (Ruff, mypy, pytest, navigator review sheet,
+  offline smoke) and documented install profiles.
+- Corrected certificate-stage routing and added LRA s136(1)(b); prepared the
+  30-case practitioner review pack without claiming lawyer approval.
+- Outcome and CCMA holding inference now prefer the final labelled decision
+  section; final suite: 707 passed, 1 skipped; Ruff clean; golden 30/30 and
+  offline smoke passed.
+- Deleted four unreferenced adapters and the unused browser path (D-030), kept
+  pypdf (D-031), and made supersede checking explicitly manual (D-032).
+- Rotated historical RUN.jsonl to
+  `data/corpus/reports/archive/RUN-through-2026-10-13.jsonl` after SHA-256
+  verification (`8DE7CF6144C2673F8F6339B1A105E374BCAB3C9FD10AF4CC0AA05377FFD1A308`).
+
+---

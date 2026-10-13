@@ -3,14 +3,15 @@
 Root: `sa_labour_corpus/`. All paths relative to it. Status values: Active,
 Deprecated, Dead, Experimental, Generated.
 
-Last verified: 2026-10-09 (holistic review; 45 review findings closed plus 15
-defects found while fixing; corpus re-parsed; see `context-refresh-log.md`).
+Last refreshed: 2026-10-13 (Git/CI baseline, legal deadline and outcome fixes,
+dead adapter removal, install profiles and audit-log rotation).
 
 ## Project root (one level above `sa_labour_corpus/`)
 
 | Path | Purpose | Status |
 |---|---|---|
-| `.gitignore` | data/, inbox bodies, logs, Python caches, coverage and build outputs (`.coverage*`, `htmlcov/`, `dist/`, `build/`). No `.git` exists yet | Active |
+| `.gitignore` | Excludes corpus bodies, logs/reports, virtual environments, caches, build outputs and the superseded pre-Git snapshot | Active |
+| `.github/workflows/ci.yml` | Python 3.11/3.13 gate: Ruff, mypy, pytest, golden review sheet and offline fixture smoke | Active |
 | `REPO_ANALYSIS_MEMORY.md` | Working state of the multi-session investigation | Active |
 | `analysis_logs/review-2026-10-09-findings.{md,json}` | Full evidence of the 2026-10-09 review: 72 findings with verifier reasoning and fix notes | Active (archive) |
 | `analysis_logs/baseline-2026-10-09/` | Pre-change copy of `sa_labour_corpus` source/tests/docs/config, `.index/` and the memory file (128 files, 1 MB). The only rollback point until git exists | Active (archive) |
@@ -20,8 +21,9 @@ defects found while fixing; corpus re-parsed; see `context-refresh-log.md`).
 
 | Path | Purpose | Status |
 |---|---|---|
-| `README.md` | Setup, commands, honesty guarantees, POPIA notes, RAG wiring | Active |
-| `pyproject.toml` | Packaging; `labour-corpus` console script; extras `browser`, `ocr`, `test` (pytest 9.1.1, pytest-cov), `lint` (ruff 0.13.3, mypy 1.18.2, types-PyYAML); `[tool.mypy]`. beautifulsoup4 removed 2026-10-09 (never imported); lxml kept as a pinned transitive of python-docx | Active |
+| `README.md` | Setup and explicit core/contributor/OCR/full install profiles, commands, honesty guarantees, POPIA notes, RAG wiring | Active |
+| `pyproject.toml` | Packaging; `labour-corpus` console script; extras `ocr`, `test`, `lint`; no browser fallback extra (D-030) | Active |
+| `docs/legal-review-2026-10-13.md` | Source-pinned review pack and sign-off fields for the 30 navigator golden cases; practitioner approval still pending | Active |
 | `docs/navigator-architecture.md` | Navigator product vision, capabilities, architecture, auth model, verified behaviour, roadmap | Active |
 | `examples/*.json` | Sample `CaseFacts` files for `navigate assess` | Active |
 | `requirements.txt` | Full pinned dev/operator set (core, playwright, OCR, test, lint), no secrets | Active |
@@ -46,7 +48,6 @@ defects found while fixing; corpus re-parsed; see `context-refresh-log.md`).
 | `http.py` | Polite fetch: per-host rate limit, retry, checksum, conditional GET, host tripping, TLS chain repair, streamed robots.txt capped at 512 KiB, Retry-After digits/HTTP-date only, trips above 900 s; every retry attempt re-checks the trip (shared fetcher across CCMA workers) | `Fetcher`, `RateLimiter.set_host_delay`, `parse_retry_after`, `MAX_RETRY_AFTER`, `MAX_CRAWL_DELAY`, `ROBOTS_MAX_BYTES`, `Fetcher._read_robots` | Active |
 | `tls.py` | Completes an incomplete chain via AIA; the gate verifies the intermediate's signature against a certifi root (D-026); AIA body streamed, 64 KiB cap | `complete_chain`, `_intermediate_is_trusted`, `_trusted_roots` (roots loaded one by one), `_download`, `looks_like_incomplete_chain` | Active |
 | `sqlite_ro.py` | **New 2026-10-09.** Stdlib-only read-only SQLite connections via `Path.as_uri()`; used by grounding, evidence and the CCMA query/catalogue/find layers | `connect_readonly`, `readonly_uri` | Active |
-| `browser.py` | Optional Playwright for JS-rendered open pages. **Untested and bypasses `check_policy`** (dead-code.md) | `BrowserFetcher`, `browser_enabled` | Active, no caller |
 | `state.py` | SQLite store: documents, citations, tags, fetch_log, gaps; `idx_documents_neutral` (link_held_citations 20x faster) | `CorpusStore`, `SCHEMA` | Active |
 | `pipeline.py` | fetch -> raw -> parse -> tag -> persist. `text_override` re-derives everything from OCR text; outcome/remedy only for judgments and awards (D-027); OOXML decompression limits; malformed DOCX XML reported, not raised | `store_raw`, `build_parsed_doc`, `persist`, `extract_text`, `ooxml_size_refusal`, `DOCX_MAX_*` | Active |
 | `observability.py` | Append-only RUN.jsonl / ERRORS.jsonl and counters | `RunLog`, `JsonlLogger` | Active |
@@ -59,11 +60,7 @@ defects found while fixing; corpus re-parsed; see `context-refresh-log.md`).
 | `crawler.py` | Orchestrator; every refusal becomes a gap. Validators only for stored documents; per-run seen set and listing cache; per-host delays registered; RetryableStatus becomes a gap; `failed` total vs `consecutive_failures` | `Crawler`, `SourceOutcome`, `_holds_stored_document`, `preflight_gaps` | Active (tests: `test_crawler.py`) |
 | `links.py` | Link discovery from index pages; no case-number enumeration | `extract_links`, `filter_links` | Active |
 | `saflii.py` | SAFLII index walking and the labour relevance filter | `find_year_links`, `find_judgment_links`, `is_labour_relevant` | Active, source blocked |
-| `ccma_site.py` | CCMA instrument recognition and the award-archive note | `detect_instruments`, `AWARD_ARCHIVE_NOTE` | **Dead** (never imported) |
 | `del_gov.py` | DEL and gov.za patterns; the 2025 dismissal code record. Only `CURRENT_DISMISSAL_CODE` is used | `CURRENT_DISMISSAL_CODE`, `mentions_superseding_instrument` (no caller) | Active, partly dead |
-| `gazette.py` | Gazette relevance filter and number extraction | `is_labour_gazette`, `gazette_numbers` | **Dead** (never imported) |
-| `mining.py` | Mining instrument recognition | `detect_mining_instruments` | **Dead** (never imported; ontology/mining.py is live) |
-| `bargaining.py` | Bargaining-council candidates and forum codes | `CANDIDATE_COUNCILS`, `detect_council` | **Dead** (never imported) |
 | `inbox.py` | Operator drop-folder ingestion with honest provenance; D-008 document boundary; filename guess: award/arbitration first, "act" only as a standalone word (2026-10-09) | `ingest_inbox`, `_doc_type_for`, `README_TEXT` | Active |
 | `citation_map.py` | Reads judgment references from harvested court indexes; SA-only | `parse_listing_line`, `collect_citations`, `CitationRecord` | Active |
 | `legacy_import.py` | Imports documents from an earlier local harvest | `classify_legacy_record`, `scan_legacy_corpus`, `LegacyDoc` | Active |
@@ -136,7 +133,7 @@ Read-only product layer over the corpus (D-022, D-023, D-028). Rules as code plu
 | `index/fts.py` | SQLite FTS5 build and search; rebuild ends with `optimize` + best-effort `VACUUM` (39.4 -> 27.3 MB measured on a copy) | `FtsIndex`, `SearchHit` | Active |
 | `report/coverage.py` | COVERAGE.md generation. **Claims an unwired supersede check** (dead-code.md) | `build_coverage_markdown`, `_GAP_LABELS` | Active |
 
-## Tests (`tests/`) — 705 passing on 2026-10-09 (421 before the review)
+## Tests (`tests/`) — 707 passing, 1 skipped on 2026-10-13 (421 before the review)
 
 | Path | Covers | Status |
 |---|---|---|

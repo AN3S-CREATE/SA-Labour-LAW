@@ -28,7 +28,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-browser = ["playwright==1.63.0"]
 ocr = ["pymupdf==1.28.2", "rapidocr-onnxruntime==1.2.3"]
 test = ["pytest==9.1.1", "pytest-cov==7.1.0"]
 lint = ["ruff==0.13.3", "mypy==1.18.2", "types-PyYAML==6.0.12.20260906"]
@@ -47,7 +46,6 @@ testpaths = ["tests"]
 addopts = "-q"
 markers = [
     "live: hits the network; deselected by default",
-    "browser: requires Playwright Chromium (RUN_BROWSER=1)",
 ]
 
 [tool.mypy]
@@ -56,5 +54,5 @@ warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 # Optional OCR backend: ships no type information and has no stub package.
-module = ["rapidocr_onnxruntime", "rapidocr_onnxruntime.*"]
+module = ["pymupdf", "pymupdf.*", "rapidocr_onnxruntime", "rapidocr_onnxruntime.*"]
 ignore_missing_imports = true

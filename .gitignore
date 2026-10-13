@@ -5,11 +5,16 @@ data/
 
 # CCMA engine runtime logs (regenerated each run; no secrets by test)
 sa_labour_corpus/logs/
+sa_labour_corpus/reports/
+
+# Pre-Git source snapshot; the initial commit supersedes it as rollback history.
+analysis_logs/baseline-2026-10-09/
 
 # Python
 __pycache__/
 *.py[cod]
 .venv/
+.venv-broken-*/
 venv/
 *.egg-info/
 .pytest_cache/

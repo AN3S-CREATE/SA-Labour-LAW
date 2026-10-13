@@ -9,7 +9,7 @@ import pytest
 
 from labour_corpus.config import CorpusPaths
 from labour_corpus.http import FetchResult
-from labour_corpus.models import DocType
+from labour_corpus.models import DocType, Outcome
 from labour_corpus.observability import RunLog
 from labour_corpus.ontology.dismissal import ALL_TAGS, OntologySchema
 from labour_corpus.ontology.mining import ALL_MINING_TAGS, overlay_to_dict
@@ -111,6 +111,15 @@ def test_automatically_unfair_records_an_audit_reason():
     decisions = [e for e in result.evidence if e.category == "outcome_decision"]
     assert decisions
     assert "verify against s187" in decisions[0].reason
+
+
+def test_outcome_uses_final_order_not_argument_summary():
+    result = tag_document(
+        "[4] The employee submitted that the dismissal was substantively unfair.\n"
+        "[18] The employer said it was fair.\n\nORDER\n"
+        "[31] The dismissal was substantively and procedurally fair."
+    )
+    assert result.outcome is Outcome.FAIR
 
 
 # -- paragraph evidence: numeric order, real markers only (D-005) -------------

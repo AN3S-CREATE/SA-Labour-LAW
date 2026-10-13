@@ -2,6 +2,17 @@
 
 ## Current Analysis Phase & Progress
 
+**2026-10-13: Post-review completion pass in final verification.** Git was
+initialized on `main`; baseline commit `b723a26` records the reviewed source
+state. GitHub Actions CI, install profiles and a project `.venv` were added;
+historical `RUN.jsonl` was hash-verified and rotated. The certificate route now
+advances past completed conciliation and distinguishes LRA s136(1)(b)
+arbitration from s191(11) Labour Court deadlines. Outcome and holding inference
+prefer final decision sections. Four dead adapters and the unused Playwright
+path were removed (D-030); pypdf retained pending a parity benchmark (D-031);
+supersede wording made explicitly manual (D-032). Automated golden-case QA is
+complete; independent practitioner sign-off remains a human-only checkpoint.
+
 **2026-10-09: Holistic review COMPLETE; corpus re-parsed.** 45 of 72 review
 findings closed (40 distinct defects) plus 15 found while fixing; decisions
 D-025..D-029. Final: 705 tests green, ruff clean, mypy = baseline (2 env-only),
@@ -30,10 +41,10 @@ per-source 8-15 s CCMA delays never applied (D-012 dead config); a persistent
 docs: 0 tags, a draft not flagged); outcome labels stored on statutes; the
 navigator counted fund rules/forms/a code as "copies" of the LRA/EEA. Fix
 workflow applying ~38 verified, test-provable fixes on disjoint file sets.
-**Deliberately not auto-fixed (need a human):** certificate-issued deadline /
-condonation logic and s136(1)(b) (lawyer), outcome-label inference from the
-order section and CCMA holdings (corpus diff review), TLS bundle hardening,
-git init/CI, project venv, pymupdf (AGPL) vs pypdfium2, deleting dead adapters.
+**Outstanding from that review:** TLS bundle hardening remains backlog. The
+legal rules are implemented and source-checked, but practitioner sign-off is
+still pending; the outcome change still requires a corpus re-parse/diff before
+stored labels are refreshed.
 
 **2026-10-08: Navigator phase 2 done except what needs people.** Interview,
 MCP server, 30 golden cases with a review sheet, and the Act doc-type fix (D-024)

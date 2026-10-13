@@ -82,7 +82,8 @@ def test_tags_mining_dismissal_with_paragraph_evidence(judgment_text):
     text, _ = judgment_text
     result = tag_document(text)
     assert "mining" in result.sector_tags
-    assert result.outcome is Outcome.UNFAIR_PROCEDURAL
+    # The final Order controls over the court's fairness finding in para 9.
+    assert result.outcome is Outcome.REVIEW_SET_ASIDE
     assert result.remedy is Remedy.REINSTATEMENT
 
     defects = process_defect_checklist(result.evidence)

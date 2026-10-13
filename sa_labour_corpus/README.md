@@ -72,24 +72,28 @@ Requires Python 3.11 or newer.
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-pip install -e .
+python -m pip install -e .
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
 py -3.11 -m venv .venv; .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-pip install -e .
+python -m pip install -e .
 ```
 
-Playwright is optional. It is only used for genuinely JavaScript-rendered pages
-on open hosts, never to get past bot management. Install it only if you need it:
+Choose the smallest install profile that matches the work:
 
 ```bash
-python -m playwright install chromium
+python -m pip install -e .                 # core crawler, parser and navigator
+python -m pip install -e ".[test,lint]"   # contributors and CI
+python -m pip install -e ".[ocr]"         # local OCR support
+python -m pip install -e ".[ocr,test,lint]"  # full operator/developer profile
 ```
+
+`requirements.txt` is the pinned full operator/developer profile. The project
+does not use a browser automation fallback: robots refusals and challenge pages
+remain explicit coverage gaps.
 
 ---
 
@@ -585,8 +589,8 @@ python -m pytest
 python -m pytest tests/test_navigator.py --cov=labour_corpus.navigator --cov-report=term-missing
 ```
 
-The suite never touches the network and never requires a browser. Live tests are
-marked `live` and browser tests require `RUN_BROWSER=1`.
+The suite never touches the network. Live tests are marked `live` and are
+deselected by default.
 
 ---
 

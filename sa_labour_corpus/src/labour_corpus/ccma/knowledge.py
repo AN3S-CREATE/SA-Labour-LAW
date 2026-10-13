@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ..ontology.dismissal import ALL_TAGS
-from ..ontology.tagger import ParagraphMap
+from ..ontology.tagger import ParagraphMap, decisive_text
 from .allowlist import RecordKind
 from .catalogue import KnowledgeUnit, record_key
 from .extract import Parsed
@@ -105,20 +105,23 @@ def find_holding(text: str) -> Finding | None:
     the conclusion at the end, usually under an 'Award' or 'Order' heading.
     """
     paragraphs = ParagraphMap.build(text)
-    matches = list(_FINDING_RE.finditer(text))
+    decision, offset = decisive_text(text)
+    matches = list(_FINDING_RE.finditer(decision))
     if not matches:
         return None
     match = matches[-1]
-    start = text.rfind("\n", 0, match.start()) + 1
-    for boundary in _SENTENCE_END_RE.finditer(text, start, match.start()):
+    match_start = match.start() + offset
+    match_end = match.end() + offset
+    start = text.rfind("\n", 0, match_start) + 1
+    for boundary in _SENTENCE_END_RE.finditer(text, start, match_start):
         start = boundary.end()
-    end_match = re.search(r"[.!?](?:\s|$)", text[match.end():])
-    end = match.end() + (end_match.end() if end_match else 0)
+    end_match = re.search(r"[.!?](?:\s|$)", text[match_end:])
+    end = match_end + (end_match.end() if end_match else 0)
     quote = text[start:end].strip()
     quote = re.sub(r"^\[\d{1,4}\]\s*", "", quote)   # the locator is carried separately
     if len(quote) > 500:
-        quote = text[max(start, match.start() - 200): match.end() + 100].strip()
-    return Finding(quote=quote, paragraph=paragraphs.label_at(match.start()))
+        quote = text[max(start, match_start - 200): match_end + 100].strip()
+    return Finding(quote=quote, paragraph=paragraphs.label_at(match_start))
 
 
 def cited_legislation(text: str) -> list[dict[str, Any]]:

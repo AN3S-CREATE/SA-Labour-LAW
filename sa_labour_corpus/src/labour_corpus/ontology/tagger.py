@@ -171,8 +171,23 @@ _COMPENSATION_ORDER_RE = re.compile(
     r"\b\d{1,2}\s*months(?:'|’)?\s*(remuneration|salary|compensation)\b",
     re.IGNORECASE)
 
+_DECISION_HEADING_RE = re.compile(
+    r"(?im)^[ \t]*(?:\d+(?:\.\d+)*[.)]?[ \t]+)?"
+    r"(?:award|order|conclusion|finding|result)[ \t]*:?[ \t]*$"
+)
+
+
+def decisive_text(text: str) -> tuple[str, int]:
+    """Return the final labelled decision section and its source offset."""
+    matches = list(_DECISION_HEADING_RE.finditer(text))
+    if not matches:
+        return text, 0
+    start = matches[-1].end()
+    return text[start:], start
+
 
 def _infer_outcome(text: str) -> Outcome:
+    text, _ = decisive_text(text)
     if _BOTH_UNFAIR_RE.search(text):
         return Outcome.BOTH
     if _AUTO_UNFAIR_RE.search(text):
@@ -185,16 +200,22 @@ def _infer_outcome(text: str) -> Outcome:
         return Outcome.UNFAIR_SUBSTANTIVE
     if procedural:
         return Outcome.UNFAIR_PROCEDURAL
-    if _REVIEW_SET_ASIDE_RE.search(text):
+    set_aside = bool(_REVIEW_SET_ASIDE_RE.search(text))
+    review_dismissed = bool(_REVIEW_DISMISSED_RE.search(text))
+    fair = bool(_FAIR_RE.search(text))
+    if sum((set_aside, review_dismissed, fair)) > 1:
+        return Outcome.UNKNOWN
+    if set_aside:
         return Outcome.REVIEW_SET_ASIDE
-    if _REVIEW_DISMISSED_RE.search(text):
+    if review_dismissed:
         return Outcome.REVIEW_UPHELD
-    if _FAIR_RE.search(text):
+    if fair:
         return Outcome.FAIR
     return Outcome.UNKNOWN
 
 
 def _infer_remedy(text: str) -> Remedy:
+    text, _ = decisive_text(text)
     if _REINSTATE_ORDER_RE.search(text):
         return Remedy.REINSTATEMENT
     if _REEMPLOY_ORDER_RE.search(text):

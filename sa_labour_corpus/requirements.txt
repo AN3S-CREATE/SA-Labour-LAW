@@ -17,8 +17,6 @@ certifi==2026.7.22
 cryptography==50.0.1
 
 # Optional. Only needed for genuinely JS-rendered public pages.
-# The test suite never requires a browser unless RUN_BROWSER=1.
-playwright==1.63.0
 
 # Optional OCR, entirely local. pymupdf renders pages; rapidocr reads them
 # without needing a system binary or administrator rights. A system tesseract

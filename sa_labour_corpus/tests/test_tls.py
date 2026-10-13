@@ -460,7 +460,7 @@ def test_an_empty_or_failed_download_gives_nothing(monkeypatch):
 def test_fetcher_never_sets_verify_false():
     """The one property that must never regress."""
     source = Path(__file__).resolve().parents[1] / "src" / "labour_corpus"
-    for module in ("http.py", "tls.py", "browser.py"):
+    for module in ("http.py", "tls.py"):
         text = (source / module).read_text(encoding="utf-8")
         assert "verify=False" not in text, f"{module} disables TLS verification"
         assert "verify = False" not in text, f"{module} disables TLS verification"

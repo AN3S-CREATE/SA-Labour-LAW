@@ -98,7 +98,8 @@ cases:
     as_of: 2026-10-07
     facts: {reason: operational_requirements, event_date: 2026-06-01,
             certificate_date: 2026-08-01}
-    expect: {track: labour_court, due: [2026-07-01, 2026-10-30], status: [expired, open]}
+    expect: {track: labour_court, due: [2026-07-01, 2026-10-30], status: [expired, open],
+             route: [lra_191_5_b]}
 
   - id: automatically-unfair-pregnancy
     as_of: 2026-10-07
@@ -111,7 +112,8 @@ cases:
     as_of: 2026-10-07
     facts: {reason: automatically_unfair, auto_unfair_ground: a_protected_strike,
             event_date: 2026-03-02, certificate_date: 2026-04-15}
-    expect: {track: labour_court, due: [2026-04-01, 2026-07-14], status: [expired, expired]}
+    expect: {track: labour_court, due: [2026-04-01, 2026-07-14], status: [expired, expired],
+             route: [lra_191_5_b]}
 
   - id: automatically-unfair-whistleblower
     as_of: 2026-10-07

@@ -820,3 +820,46 @@ errors on corrupt input — a legacy `.doc` served as `.docx` raised `BadZipFile
 and ended a run during development. One malformed government PDF must never end
 a multi-hour crawl. The failure is recorded with its exception type and the run
 continues.
+
+---
+
+## D-030 — Retire unused adapters and browser fallback
+
+**Date:** 2026-10-13 · **Status:** Accepted
+
+**Decision.** Delete the four never-imported source adapters (`bargaining.py`,
+`ccma_site.py`, `gazette.py`, `mining.py`) and the never-called Playwright
+`browser.py`. Remove the browser extra and setting. Challenge and robots
+refusals remain explicit gaps; there is no browser fallback.
+
+**Rationale.** The modules had no production caller or meaningful test path.
+The browser path also bypassed the central policy gate, so retaining it created
+security and policy ambiguity without adding coverage.
+
+---
+
+## D-031 — Retain pypdf as the primary PDF text engine
+
+**Date:** 2026-10-13 · **Status:** Accepted
+
+**Decision.** Keep `pypdf` for text extraction and page counting. Do not replace
+it with `pypdfium2` until a corpus-wide text, metadata, error-mode and licensing
+benchmark demonstrates parity and a migration benefit.
+
+**Rationale.** The current parser has page-level recovery, OCR fallback and a
+large regression suite coupled to pypdf's documented error classes. A renderer
+swap is not a safe bundle-size-only change.
+
+---
+
+## D-032 — Supersede status is manual and explicit
+
+**Date:** 2026-10-13 · **Status:** Accepted
+
+**Decision.** COVERAGE.md and `sources.yaml` must say that no automatic
+supersede check is implemented. Operators must confirm the 2025 dismissal
+code's currency against the Government Gazette before reliance.
+
+**Rationale.** A dead regex helper was never wired into collection and could
+not establish legal currency. Explicit uncertainty is safer than a false
+automation claim.

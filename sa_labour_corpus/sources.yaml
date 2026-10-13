@@ -59,8 +59,8 @@ sources:
       The consolidated Code of Good Practice on Dismissal took effect on
       4 September 2025 (GG 53294, GN 3470) and replaced the former Schedule 8
       and the operational-requirements code. Treat it as current unless a later
-      gazette supersedes it; the parser flags any instrument that appears to
-      supersede it.
+      gazette supersedes it. No automatic supersede check is implemented;
+      confirm currency against the Government Gazette before relying on it.
     license_note: >-
       Republic of South Africa. Confirm against the Government Gazette.
 

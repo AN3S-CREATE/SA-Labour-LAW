@@ -382,10 +382,8 @@ def build_coverage_markdown(
             ["CCMA publishes rules and educational material, not a bulk award API",
              "Confirmed; the site also refuses identified crawlers"],
             ["The 2025 Code of Good Practice on Dismissal is current",
-             "Treated as current; the crawler flags any instrument that appears "
-             "to supersede it, but confirm against the Gazette"],
-            ["Playwright runs locally, not on a remote grid",
-             "Holds; the browser path is local and refuses challenge pages"],
+             "Treated as current, but no automatic supersede check is implemented. "
+             "Confirm currency against the Government Gazette before relying on it"],
             ["No budget for paid legal databases in v1",
              "Holds; paid hosts are a hard error in the registry"],
         ],

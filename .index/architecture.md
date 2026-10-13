@@ -118,8 +118,8 @@ a certifi root's key verifies its signature (D-026).
 - 1–2 s jittered delay per host, raised to a source's own `min_delay`/
   `max_delay` (CCMA 8-15 s) and to the published crawl-delay; one request at a
   time per host; a Crawl-delay or Retry-After above 900 s trips the host.
-- Playwright is optional, local, and barred from being used against a challenge;
-  tests never need a browser unless `RUN_BROWSER=1`.
+- There is no browser automation fallback. Robots refusals and challenge pages
+  remain explicit coverage gaps (D-030).
 - Paid legal publishers are a hard error at registry load.
 
 ## Access reality (verified 2026-09-17)
@@ -215,7 +215,7 @@ Entry points (2026-10-08): `navigate assess` (JSON facts), `navigate interview`
 (plain-language questions), MCP `dismissal-navigator` (`navigator_assess`,
 `navigator_provisions`; reuses the CCMA server's protocol loop via an
 overridable `Server`). Quality gate: 30 golden fact patterns run in the test
-suite (there is no CI yet), with a `review-sheet` for a lawyer's sign-off
+suite and the GitHub Actions CI gate, with a `review-sheet` for a lawyer's sign-off
 (pending).
 
 Since 2026-10-09: a held copy counts only if it self-identifies as the Act

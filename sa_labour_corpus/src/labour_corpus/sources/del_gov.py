@@ -53,11 +53,6 @@ _CODE_RE = re.compile(
     r"Code of Good Practice[^.\n]{0,60}Dismissal|\bGG\s?53294\b|\bGN\s?3470\b",
     re.IGNORECASE,
 )
-_SUPERSEDING_RE = re.compile(
-    r"\b(repeals?|replaces?|supersedes?|withdrawn|withdraws?)\b[^.\n]{0,80}"
-    r"Code of Good Practice[^.\n]{0,60}Dismissal",
-    re.IGNORECASE,
-)
 
 # Statutes this source is expected to yield, used to report what is missing.
 EXPECTED_STATUTES: tuple[str, ...] = (
@@ -75,12 +70,3 @@ EXPECTED_STATUTES: tuple[str, ...] = (
 def is_dismissal_code(text: str, title: str | None = None) -> bool:
     """Whether a document is a Code of Good Practice on Dismissal."""
     return bool(_CODE_RE.search(f"{title or ''}\n{text[:40_000]}"))
-
-
-def mentions_superseding_instrument(text: str) -> bool:
-    """Flag text that appears to repeal or replace a dismissal code.
-
-    Used to notice a later instrument rather than assuming the 2025 code is
-    permanently current.
-    """
-    return bool(_SUPERSEDING_RE.search(text[:80_000]))

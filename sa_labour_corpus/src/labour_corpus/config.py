@@ -210,7 +210,6 @@ class CrawlSettings:
     max_delay: float = 2.0
     timeout: float = 45.0
     acknowledged_public_sources: bool = False
-    allow_browser: bool = False
 
     @property
     def user_agent(self) -> str:

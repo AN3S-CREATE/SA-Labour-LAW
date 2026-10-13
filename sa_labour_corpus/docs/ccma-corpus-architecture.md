@@ -19,7 +19,7 @@ Written 2026-09-23. Research and retrieval tool; not legal advice.
 | TLS chain completion for hosts that omit the intermediate (the CCMA does), with verification kept on | `tls.py` | Working (D-013) |
 | Source registry with observed access status; paid publishers a hard error | `sources/registry.py`, `sources.yaml` | 26 sources, 14 collectable |
 | Link discovery; SAFLII year-index and judgment-link walkers | `sources/links.py`, `sources/saflii.py` | Written and tested; SAFLII itself blocked |
-| CCMA instrument recognition | `sources/ccma_site.py` | Recognises rules/forms; no award adapter |
+| CCMA instruments | `ccma/find.py` + `ccma/extract.py` | Discovers and parses configured rules/forms; no bulk award API |
 | Format sniffing, PDF/Word/RTF/HTML text, optional local OCR | `parse/*.py`, `pipeline.py` | Working |
 | Judgment/award metadata read verbatim or left null, incl. CCMA case numbers (`GAJB1234-24`) | `parse/judgment.py` | Working |
 | POPIA redaction (validated SA ID, labelled bank/tax, phone, e-mail) | `parse/redaction.py` | Working, narrow by design (D-007) |

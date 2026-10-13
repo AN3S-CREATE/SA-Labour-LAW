@@ -41,7 +41,7 @@ from labour_corpus.ccma.find import (
     parse_saflii_year_listing,
 )
 from labour_corpus.ccma.harvest import ALL_STAGES, HarvestOptions, Harvester
-from labour_corpus.ccma.knowledge import FOOTER, build_scenarios, cards_from_rows
+from labour_corpus.ccma.knowledge import FOOTER, build_scenarios, cards_from_rows, find_holding
 from labour_corpus.ccma.mcp_server import LIVE_HARVEST_ENV, Server, serve
 from labour_corpus.ccma.minimise import assert_minimised, minimise, residual_identifiers
 from labour_corpus.ccma.paths import CcmaPaths
@@ -453,6 +453,16 @@ def test_ac7_fixture_award_yields_case_card_citing_its_case_number(root: Path):
             assert note["native_ids"] == ["ZACCMA-2024-12"]
             assert note["confidence"] in {"high", "medium", "low"}
         assert [n for n in sbody["notes"] if n["confidence"] == "high"][0]["basis"].startswith("verbatim")
+
+
+def test_find_holding_prefers_final_order_over_party_submissions():
+    finding = find_holding(
+        "[4] The applicant submitted that the dismissal was unfair.\n\n"
+        "ORDER\n[29] The dismissal was substantively and procedurally fair."
+    )
+    assert finding is not None
+    assert finding.quote == "The dismissal was substantively and procedurally fair."
+    assert finding.paragraph == "29"
 
 
 def test_ac8_no_knowledge_unit_carries_an_identifier_from_the_fixture(root: Path):

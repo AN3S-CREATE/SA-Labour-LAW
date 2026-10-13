@@ -54,7 +54,8 @@ class Navigator:
                 raise ValueError(f"{name} is after the assessment date")
         cls = classify(facts)
         deadlines = self._deadlines(facts, cls.track, as_of)
-        late = any(d.status is DeadlineStatus.EXPIRED for d in deadlines[:1])
+        active = deadlines[-1:] if facts.certificate_date is not None else deadlines[:1]
+        late = any(d.status is DeadlineStatus.EXPIRED for d in active)
         route = self._route(facts, cls.track, late)
         remedy, remedy_basis = self._remedy(facts, cls.automatically_unfair)
 
@@ -102,8 +103,16 @@ class Navigator:
                                   self.ref("eea_10_2"))]
         if facts.dispute is DisputeKind.UNFAIR_LABOUR_PRACTICE:
             start = max(facts.event_date, facts.became_aware_date or facts.event_date)
-            return [make_deadline("Refer the dispute for conciliation", add_days(start, 90),
-                                  today, self.ref("lra_191_1_b_ii"))]
+            out = [make_deadline("Refer the dispute for conciliation", add_days(start, 90),
+                                 today, self.ref("lra_191_1_b_ii"))]
+            if facts.certificate_date is not None and not facts.probation:
+                out.append(make_deadline(
+                    "Request arbitration", add_days(facts.certificate_date, 90),
+                    today, self.ref("lra_136_1_b"),
+                    note="LRA s136 permits condonation on good cause if this "
+                         "90-day request period is missed.",
+                ))
+            return out
         start = max(facts.event_date, facts.final_decision_date or facts.event_date)
         out = [make_deadline("Refer the dismissal dispute for conciliation",
                              add_days(start, 30), today, self.ref("lra_191_1_b_i"),
@@ -121,33 +130,53 @@ class Navigator:
                 else:
                     out.append(make_deadline(step, add_days(facts.certificate_date, 90),
                                              today, basis))
-            case Track.ARBITRATION | Track.EEA_LABOUR_COURT:
-                pass            # no Labour Court referral deadline on these tracks
+            case Track.ARBITRATION:
+                if facts.certificate_date is not None and not facts.probation:
+                    out.append(make_deadline(
+                        "Request arbitration", add_days(facts.certificate_date, 90),
+                        today, self.ref("lra_136_1_b"),
+                        note="LRA s136 permits condonation on good cause if this "
+                             "90-day request period is missed.",
+                    ))
+            case Track.EEA_LABOUR_COURT:
+                pass
             case _:
                 assert_never(track)
         return out
 
     def _route(self, facts: CaseFacts, track: Track, late: bool) -> list[RouteStep]:
         first_basis = "eea_10_2" if track == Track.EEA_LABOUR_COURT else "lra_191_1_a"
-        steps = [RouteStep(order=1, forum=conciliation_forum(facts),
-                           action="Refer the dispute for conciliation and serve a copy "
-                                  "on the employer",
-                           basis=self.ref(first_basis))]
+        conciliation_done = facts.certificate_date is not None
+        forum = conciliation_forum(facts)
+        steps = [] if conciliation_done else [RouteStep(
+            order=1, forum=forum,
+            action="Refer the dispute for conciliation and serve a copy on the employer",
+            basis=self.ref(first_basis),
+        )]
         if late:
-            key = "eea_10_3" if track == Track.EEA_LABOUR_COURT else "lra_191_2"
-            steps.append(RouteStep(order=1, forum=steps[0].forum,
-                                   action="Apply for condonation of the late referral, "
-                                          "showing good cause",
-                                   basis=self.ref(key)))
+            if conciliation_done and track is Track.ARBITRATION:
+                steps.append(RouteStep(
+                    order=2, forum=forum,
+                    action="Apply for condonation of the late arbitration request, "
+                           "showing good cause",
+                    basis=self.ref("lra_136_1_b"),
+                ))
+            elif not conciliation_done:
+                key = "eea_10_3" if track == Track.EEA_LABOUR_COURT else "lra_191_2"
+                steps.append(RouteStep(order=1, forum=forum,
+                                       action="Apply for condonation of the late referral, "
+                                              "showing good cause",
+                                       basis=self.ref(key)))
         if track == Track.ARBITRATION:
             note = ""
             if facts.probation:
                 note = "For a probation-related dismissal, arbitration starts immediately."
-            steps.append(RouteStep(order=2, forum=steps[0].forum,
-                                   action="If conciliation fails, request arbitration",
+            steps.append(RouteStep(order=2, forum=forum,
+                                   action=("Request arbitration" if conciliation_done else
+                                           "If conciliation fails, request arbitration"),
                                    basis=self.ref("lra_191_5_a"), note=note))
             if facts.probation:
-                steps.append(RouteStep(order=2, forum=steps[0].forum,
+                steps.append(RouteStep(order=2, forum=forum,
                                        action="Arbitration follows the certificate "
                                               "without a new request",
                                        basis=self.ref("lra_191_5A")))

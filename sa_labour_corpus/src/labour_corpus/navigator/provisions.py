@@ -75,6 +75,10 @@ _ALL: tuple[Provision, ...] = (
     Provision("lra_191_13", LRA, "LRA s191(13)",
               "subjected to an occupational detriment by the employer in contravention "
               "of section 3 of the protected disclosures act"),
+    Provision("lra_136_1_b", LRA, "LRA s136(1)(b)",
+              "within 90 days after the date on which that certificate was issued, any "
+              "party to the dispute has requested that the dispute be resolved through "
+              "arbitration"),
     Provision("lra_192_2", LRA, "LRA s192(2)",
               "the employer must prove that the dismissal is fair"),
     Provision("lra_194_1", LRA, "LRA s194(1)",

@@ -404,6 +404,26 @@ def test_labour_court_track_deadline_waits_for_certificate_then_runs_90_days():
     assert a.remedy_basis.key == "lra_194_3"
 
 
+def test_certificate_advances_arbitration_route_and_starts_s136_deadline():
+    a = nav().assess(facts(reason=ReasonGiven.CONDUCT,
+                           event_date=date(2026, 6, 1),
+                           certificate_date=date(2026, 8, 1)), TODAY)
+    assert [d.due for d in a.deadlines] == [date(2026, 7, 1), date(2026, 10, 30)]
+    assert [step.basis.key for step in a.route if step.basis] == ["lra_191_5_a"]
+    assert a.route[0].action == "Request arbitration"
+
+
+def test_late_s136_request_gets_arbitration_condonation_not_referral_condonation():
+    a = nav().assess(facts(reason=ReasonGiven.CONDUCT,
+                           event_date=date(2026, 1, 1),
+                           certificate_date=date(2026, 4, 1)), TODAY)
+    assert a.deadlines[-1].status is DeadlineStatus.EXPIRED
+    assert [step.basis.key for step in a.route if step.basis] == [
+        "lra_136_1_b", "lra_191_5_a"
+    ]
+    assert "arbitration request" in a.route[0].action
+
+
 def test_election_and_probation_routes():
     a = nav().assess(facts(reason=ReasonGiven.OPERATIONAL_REQUIREMENTS,
                            employer_has_fewer_than_10_employees=True), TODAY)
