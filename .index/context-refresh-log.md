@@ -450,4 +450,21 @@ Regenerated, and `search` now warns when the index predates the corpus (D-018).
   `data/corpus/reports/archive/RUN-through-2026-10-13.jsonl` after SHA-256
   verification (`8DE7CF6144C2673F8F6339B1A105E374BCAB3C9FD10AF4CC0AA05377FFD1A308`).
 
+## 2026-10-13 — Outcome refresh, verification and optimisation roadmap
+
+- Backed up all 397 parsed records and `corpus.sqlite`; verified database
+  SHA-256 `0FEA06B3D994647E55B198C6D501420746486C5E389658731B40DE7BCBC29943`.
+- Rejected and rolled back a full parse whose environment lacked `antiword`
+  and would have introduced 69 unrelated legacy-Word metadata changes.
+- Re-tagged the 12 adjudicative documents from preserved text; 7 records
+  changed. Rebuilt the 397-document FTS index and regenerated COVERAGE.md.
+- Acceptance audit is 10/11: criterion 5 correctly remains pending because the
+  rotated run history has no new real conditional-request crawl evidence.
+- Mypy reports no issues in 72 source files. Removed both ignored failed
+  `.venv-broken-*` directories and verified the working `.venv` imports.
+- Added `sa_labour_corpus/docs/optimisation-roadmap.md`; refreshed inventory,
+  dead-code/debt state, and repository analysis memory from inspected files.
+- External gates: practitioner signature, valid crawler contact/live run, and
+  operator-confirmed Git remote plus hosted CI.
+
 ---

@@ -2,7 +2,7 @@
 
 ## Current Analysis Phase & Progress
 
-**2026-10-13: Post-review completion pass in final verification.** Git was
+**2026-10-13: Post-review completion pass locally complete; external gates pending.** Git was
 initialized on `main`; baseline commit `b723a26` records the reviewed source
 state. GitHub Actions CI, install profiles and a project `.venv` were added;
 historical `RUN.jsonl` was hash-verified and rotated. The certificate route now
@@ -10,8 +10,13 @@ advances past completed conciliation and distinguishes LRA s136(1)(b)
 arbitration from s191(11) Labour Court deadlines. Outcome and holding inference
 prefer final decision sections. Four dead adapters and the unused Playwright
 path were removed (D-030); pypdf retained pending a parity benchmark (D-031);
-supersede wording made explicitly manual (D-032). Automated golden-case QA is
-complete; independent practitioner sign-off remains a human-only checkpoint.
+supersede wording made explicitly manual (D-032). All 12 adjudicative records
+were re-tagged from their preserved text, changing 7 records; all 397 records
+were re-indexed and COVERAGE.md regenerated. Mypy is clean across 72 source
+files. Acceptance is 10/11 because the newly rotated run history intentionally
+contains no fabricated conditional-request evidence. Automated golden-case QA
+is complete; practitioner sign-off, an identified live crawl, and the intended
+Git remote/hosted CI remain external checkpoints.
 
 **2026-10-09: Holistic review COMPLETE; corpus re-parsed.** 45 of 72 review
 findings closed (40 distinct defects) plus 15 found while fixing; decisions
@@ -324,6 +329,15 @@ bounded pagination; `query_terms` was dropped as unworkable.
   `BadZipFile` and ended a run. Parse failures are now isolated per document.
 
 ## Session Log
+
+- [2026-10-13] Completed the safe outcome-label data refresh. A full 397-file
+  parse exposed missing `antiword` in the new environment and would have
+  changed 69 legacy-document fields, so the corpus was restored from a
+  hash-verified backup and only the 12 adjudicative texts were re-tagged.
+  Seven records changed, then all 397 records were indexed and COVERAGE.md was
+  regenerated. Acceptance audit: 10/11, with C5 pending a real post-rotation
+  identified crawl. Mypy: clean in 72 source files. Removed both failed
+  `.venv-broken-*` directories recoverably and added the optimisation roadmap.
 
 - [2026-10-09] Holistic optimisation review and fix pass (multi-agent):
   review (15 agents) -> fixes (16 agents, 7 file-disjoint implementers each

@@ -24,9 +24,10 @@ dead adapter removal, install profiles and audit-log rotation).
 | `README.md` | Setup and explicit core/contributor/OCR/full install profiles, commands, honesty guarantees, POPIA notes, RAG wiring | Active |
 | `pyproject.toml` | Packaging; `labour-corpus` console script; extras `ocr`, `test`, `lint`; no browser fallback extra (D-030) | Active |
 | `docs/legal-review-2026-10-13.md` | Source-pinned review pack and sign-off fields for the 30 navigator golden cases; practitioner approval still pending | Active |
+| `docs/optimisation-roadmap.md` | Prioritised performance, security, bundle, architecture, quality and cost recommendations with implementation status and release gates | Active |
 | `docs/navigator-architecture.md` | Navigator product vision, capabilities, architecture, auth model, verified behaviour, roadmap | Active |
 | `examples/*.json` | Sample `CaseFacts` files for `navigate assess` | Active |
-| `requirements.txt` | Full pinned dev/operator set (core, playwright, OCR, test, lint), no secrets | Active |
+| `requirements.txt` | Full pinned dev/operator set (core, OCR, test, lint), no secrets; browser automation removed by D-030 | Active |
 | `rebuild_corpus.sh` | crawl -> imports -> parse --ocr -> index -> report; `set -euo pipefail` with guarded greps, so a failing stage stops the rebuild (2026-10-09) | Active |
 | `tools/acceptance_audit.py` | Checks the 11 acceptance criteria against a built corpus. C5 now fails on repeat 200 downloads of unchanged bodies (`resume_evidence`) | Active |
 | `sources.yaml` | Source registry with live-verified access status per host. 26 sources, 14 collectable | Active |
@@ -60,7 +61,7 @@ dead adapter removal, install profiles and audit-log rotation).
 | `crawler.py` | Orchestrator; every refusal becomes a gap. Validators only for stored documents; per-run seen set and listing cache; per-host delays registered; RetryableStatus becomes a gap; `failed` total vs `consecutive_failures` | `Crawler`, `SourceOutcome`, `_holds_stored_document`, `preflight_gaps` | Active (tests: `test_crawler.py`) |
 | `links.py` | Link discovery from index pages; no case-number enumeration | `extract_links`, `filter_links` | Active |
 | `saflii.py` | SAFLII index walking and the labour relevance filter | `find_year_links`, `find_judgment_links`, `is_labour_relevant` | Active, source blocked |
-| `del_gov.py` | DEL and gov.za patterns; the 2025 dismissal code record. Only `CURRENT_DISMISSAL_CODE` is used | `CURRENT_DISMISSAL_CODE`, `mentions_superseding_instrument` (no caller) | Active, partly dead |
+| `del_gov.py` | DEL and gov.za patterns plus the cautiously stated 2025 dismissal-code record | `CURRENT_DISMISSAL_CODE`, `is_dismissal_code` | Active |
 | `inbox.py` | Operator drop-folder ingestion with honest provenance; D-008 document boundary; filename guess: award/arbitration first, "act" only as a standalone word (2026-10-09) | `ingest_inbox`, `_doc_type_for`, `README_TEXT` | Active |
 | `citation_map.py` | Reads judgment references from harvested court indexes; SA-only | `parse_listing_line`, `collect_citations`, `CitationRecord` | Active |
 | `legacy_import.py` | Imports documents from an earlier local harvest | `classify_legacy_record`, `scan_legacy_corpus`, `LegacyDoc` | Active |
@@ -77,7 +78,7 @@ dead adapter removal, install profiles and audit-log rotation).
 | `download.py` | Original bytes + `.sha256` + meta; checksum conflict -> quarantine | `store_artifact` | Active |
 | `extract.py` | Text, redaction, metadata, dispute type, scan detection, statute checks; pypdf imported lazily; `pdf_page_count` catches `PyPdfError` | `parse_artifact`, `pdf_page_count`, `substantive_chars` | Active |
 | `minimise.py` | Knowledge-layer PII removal + assertion | `minimise`, `assert_minimised` | Active |
-| `knowledge.py` | Case cards, strategies, scenarios; no LLM. **`find_holding` misquotes on real judgments** (dead-code.md) | `build_record_units`, `build_scenarios`, `find_holding` | Active |
+| `knowledge.py` | Case cards, strategies, scenarios; final-decision-section holding extraction; no LLM | `build_record_units`, `build_scenarios`, `find_holding` | Active |
 | `seed.py` | Idempotent upsert + knowledge; scenario compile; JSON export | `seed_one`, `compile_scenarios` | Active |
 | `harvest.py` | Orchestrator with gates, checkpoints, audit | `Harvester`, `HarvestOptions`, `RETRY_WAITS` | Active |
 | `troubleshoot.py` | Error classes, remedies, disk check, secret scan | `classify_exception`, `diagnose`, `scan_for_secrets` | Active |
@@ -93,7 +94,7 @@ Read-only product layer over the corpus (D-022, D-023, D-028). Rules as code plu
 | Path | Purpose | Key symbols | Status |
 |---|---|---|---|
 | `models.py` | Typed contracts; `CaseFacts` forbids extra fields; `Assessment` frozen | `CaseFacts`, `Assessment`, `ProvisionRef`, `Grounding` | Active |
-| `provisions.py` | 21 verbatim provisions (LRA s186-s194, EEA s10) | `PROVISIONS`, `ACT_TITLES`, `get` | Active |
+| `provisions.py` | 22 verbatim provisions (including LRA s136(1)(b), s186-s194 and EEA s10) | `PROVISIONS`, `ACT_TITLES`, `get` | Active |
 | `grounding.py` | Re-finds each quote in held, readable, non-draft copies that **self-identify as the Act** (D-028); normalised text cached per doc_id on (mtime_ns, size); `normalise` uses chained replace (8x faster, identical output) | `ground`, `normalise`, `CorpusSource`, `TextCache`, `HeldText`, `corpus_source` | Active |
 | `routing.py` | Classification and track; `Track` is a `StrEnum` | `classify`, `Track`, `conciliation_forum`, `checklist` | Active |
 | `deadlines.py` | Calendar-day / calendar-month arithmetic; never extended | `add_days`, `add_months`, `make_deadline` | Active |
@@ -124,14 +125,14 @@ Read-only product layer over the corpus (D-022, D-023, D-028). Rules as code plu
 |---|---|---|---|
 | `dismissal.py` | LRA-structured tag vocabulary incl. the process-defect layer | `ALL_TAGS`, `Tag`, `OntologySchema` | Active |
 | `mining.py` | MHSA/MPRDA overlay and the sector decision rule | `ALL_MINING_TAGS`, `MINING_TAG_THRESHOLD` | Active |
-| `tagger.py` | Tags with paragraph evidence; year-shaped citation lines are not paragraph markers; evidence paragraphs sorted numerically. **Outcome inference from first mention is unreliable** (dead-code.md) | `tag_document`, `ParagraphMap`, `TaggingResult` | Active |
+| `tagger.py` | Tags with paragraph evidence; final labelled decision section controls outcome/remedy inference; conflicts return unknown | `decisive_text`, `tag_document`, `ParagraphMap`, `TaggingResult` | Active |
 
 ## Index and report
 
 | Path | Purpose | Key symbols | Status |
 |---|---|---|---|
 | `index/fts.py` | SQLite FTS5 build and search; rebuild ends with `optimize` + best-effort `VACUUM` (39.4 -> 27.3 MB measured on a copy) | `FtsIndex`, `SearchHit` | Active |
-| `report/coverage.py` | COVERAGE.md generation. **Claims an unwired supersede check** (dead-code.md) | `build_coverage_markdown`, `_GAP_LABELS` | Active |
+| `report/coverage.py` | COVERAGE.md generation; explicitly states that dismissal-code supersede checking is manual | `build_coverage_markdown`, `_GAP_LABELS` | Active |
 
 ## Tests (`tests/`) — 707 passing, 1 skipped on 2026-10-13 (421 before the review)
 

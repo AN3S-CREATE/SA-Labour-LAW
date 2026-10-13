@@ -3,14 +3,13 @@
 Entries are dead code, known limitations and debt, with evidence and a
 recommended action. Resolved entries stay, struck through, with the resolution.
 
-Last verified: 2026-10-09 (holistic review: 72 verified findings; evidence in
-`analysis_logs/review-2026-10-09-findings.md`).
+Last verified: 2026-10-13 (post-review completion and real-corpus decision
+retag; evidence in the refresh log and `docs/optimisation-roadmap.md`).
 
 ## Dead code (found 2026-10-09)
 
 | Item | Evidence | Impact | Priority | Recommended action |
 |---|---|---|---|---|
-| Four `sources/*` adapters are never imported: `bargaining.py`, `gazette.py`, `mining.py`, `ccma_site.py` (~250 lines) | grep across src, tests, tools, mcp finds no import; the live `detect_instruments` is `parse/statute.py`. `ccma_site.AWARD_ARCHIVE_NOTE` ("millions") drifts from coverage.py ("4.2 million") | Medium: the inventory, `docs/ccma-corpus-architecture.md:22` and the gazette debt row assume they run | Next Sprint | Owner decision: delete bargaining/mining/ccma_site (they duplicate ontology/mining.py and statute.KNOWN_INSTRUMENTS); for gazette.py either delete and use `title_filter` when `gpw_gazettes` is enabled, or wire `is_labour_gazette` |
 | Unreferenced helpers | `CorpusStore.transaction`, `FtsIndex.document_count`, `Catalogue.parsed_records`, `AllowList.hosts_for`, `catalogue.KNOWLEDGE_KINDS`, `legacy_import.iter_importable`, `saflii.find_original_files`, `saflii.find_legislation_links`; `tagger.process_defect_checklist` is used only by tests | Low | Backlog | Delete the first six. Keep the saflii helpers (row below: live the moment access is granted) |
 
 ## Tech debt
@@ -18,7 +17,6 @@ Last verified: 2026-10-09 (holistic review: 72 verified findings; evidence in
 | Item | Evidence | Impact | Priority | Recommended action |
 |---|---|---|---|---|
 | `saflii.py` index-walking code is unexercised against the live site | Source is blocked by D-001, so the walker never runs end to end | Medium | Medium | Keep and unit-test against fixtures. It becomes live the moment access is granted |
-| `gazette.py` / `gpw_gazettes` disabled by default | GPW archive is paginated per publication date; a full sweep is very large. **Note 2026-10-09:** `gazette.py` is not imported, so enabling the source would not run `is_labour_gazette` | Medium | Low | Add date-range paging before enabling, and decide gazette.py's fate (dead-code row above) |
 | OCR is slow on CPU | rapidocr reads roughly one page every 22 s at 300 dpi; 104 pages is about 40 minutes | Low | Low | Install tesseract for a large speed-up, or lower `--dpi` if accuracy allows |
 | RTF parser is a hand-rolled control-word stripper | `parse/text.py:rtf_to_text`. **2026-10-09:** quadratic slicing fixed (928k chars: 16.9 s -> 0.47 s), `\'hh` now decoded in the declared `\ansicpgN` (cp1252 default), `\ucN` fallback skipped, surrogate pairs combined | Low | Low | Replace only if RTF sources become reachable |
 | Language detection is marker-frequency based | `parse/text.py:detect_language`; only distinguishes en / af / unknown | Low | Low | Sufficient for this corpus; revisit if other languages appear |
@@ -28,7 +26,6 @@ Last verified: 2026-10-09 (holistic review: 72 verified findings; evidence in
 | Crawled DEL LRA PDF is a pre-2014 consolidation (2026-10-07) | `56dd213b…` lacks Act 6 of 2014 wording in s186(1)(e), s186(2), s191(2), s194(4) (D-023). Nothing in the corpus marks it as outdated | Medium | Medium | Add an outdated-consolidation flag or parser note and prefer the amended copy |
 | Display titles read wrongly (2026-10-08, more evidence 2026-10-09) | `_ACT_TITLE_RE`/`_find_self_title`: lowercase connectors end the name (OHSA "Safety Amendment Act", MHSA "Safety Act"); `\s+` crosses blank lines ("DEPARTMENT OF LABOUR OCCUPATIONAL …"); "Name Act, Act 29 of 1996" gives ", Act"; "as amended by" lines give the Constitution "South Africa Amendment Act"; the truncation also defeats the cross-reference guard (guideline d64c2408) | Medium: titles feed grounding's first-stage title filter and evidence exclusions | Next Sprint (M) | Measured design in the review evidence: truncate at "as amended by", prefer the "No. N of YYYY: Name Act" line, allow lowercase connectors with at most one line break. Measured: 26 of 385 titles change, 23 corrections, 0 regressions. Needs a corpus-wide diff review before re-parse |
 | Navigator evidence is thin for misconduct and capacity | 12 judgments held; the misconduct query returns none after filtering | Low (honest) | Low | Closes with case-law access (Q1, D-001), not with looser filters |
-| **CCMA holdings misquote** (critic) | `ccma/knowledge.find_holding` takes the last finding-regex match anywhere and starts at the previous newline: 6 of 12 held judgments would yield "The decision-maker found: …" at high confidence, none the court's own finding (party claims, quoted cases, mid-sentence fragments) | High once `ccma harvest -s local_corpus` runs (0 units today) | Next Sprint (M) | Restrict to the decision section, reject claim/report verbs, sentence-start via whitespace-normalised text, drop year-shaped locators; otherwise return None (medium confidence) |
 | Tagger runs 393 full-text regex scans per document | Every pattern starts with `\b` under IGNORECASE; 1,437.6 s of 24 min parse CPU across 397 texts; matched patterns scan twice | Medium (cost) | Next Sprint (M) | Exact rewrites measured: one finditer instead of search+finditer; `\bX` -> `X(?<!\w\w)` (2.1x); per-document literal-prefix skip (1.8x). Needs review under D-005 |
 | CCMA catalogue seed is O(n²) | FTS deletes filter on UNINDEXED columns (`SCAN records_fts`); per-record cost grows linearly with rows | Low today (1 record) | Backlog (M) | Key FTS rows by rowid with a catalogue migration; batch commits per source |
 | No schema version or migration framework | `PRAGMA user_version = 0` on both stores; read-only consumers crash on an older schema (`navigate assess` -> OperationalError, exit 1) | Medium | Next Sprint (M) | `db.py` with per-store versions, `migrate()`, `open_ro(min_version)`; navigator maps a stale schema to not_checked |
@@ -45,8 +42,7 @@ Last verified: 2026-10-09 (holistic review: 72 verified findings; evidence in
 | Robots-driven trips share the `http_error` gap kind | `robots_oversize`, `crawl_delay`, `retry_after` trips are `http_error` gaps; only per-URL `RobotsDisallowed` is `robots_disallow` | Low (reporting) | Backlog | Key the gap kind on `fetcher.tripped_hosts[host]` if COVERAGE.md should group them |
 | CCMA engine reports back-off trips as policy refusals (integration review, 2026-10-09) | `http.py` now trips a host for a Crawl-delay or Retry-After beyond 900 s (D-025). `ccma/troubleshoot.classify_exception` maps every `HostTripped` to `POLICY_BLOCK` (not retryable), and `_robots_preflight` / `report._next_actions` then say "robots.txt refused ... set `enabled: false`" even though robots permits the path | Low: wrong operator advice, no wrong fetch; CCMA source is disabled today | Next Sprint | A `HostBackoff(HostTripped)` subclass for the delay/Retry-After trips, mapped to a retryable class and to "retry a later run" wording |
 | CCMA harvest raises the shared limiter's global pace | `ccma/harvest.py:165-166` raises `limiter.min/max_delay` for every host when a slower source is added (never lowers; conservative) | Low | Backlog | Use `RateLimiter.set_host_delay` |
-| Environment drift | Runs on the shared global Python 3.13 (no project `.venv`); installed pytest 9.1.1 (pin now 9.1.1); stale editable metadata (`pip show` lacks certifi/cryptography, lists beautifulsoup4); ruff/mypy not installed (run via `uvx`); 17 transitive packages unpinned | Medium | Next Sprint | Create the README's `.venv`, `pip install -e ".[test,lint]"`; consider a lock file (uv lock / pip-compile --generate-hashes) |
-| Acceptance C5 fails on historical RUN.jsonl | C5 now counts repeat 200s of unchanged bodies; RUN.jsonl is append-only and holds the 2026-09-20 repeats (17 URLs, ~89.5 MB) | Expected | — | Rotate (archive) RUN.jsonl before the next crawl; C5 then measures the new resume behaviour |
+| Acceptance C5 has no post-rotation observation yet | Historical RUN.jsonl was archived; the new log currently contains zero crawl runs, zero repeat 200s and zero 304s | Evidence gap, not a product failure | Next live run | Run one identified crawl with the operator's valid contact address, then rerun the audit; do not manufacture evidence |
 
 ## Resolved
 
@@ -58,6 +54,8 @@ Last verified: 2026-10-09 (holistic review: 72 verified findings; evidence in
 | ~~Outcome labels and CCMA holdings read argument summaries~~ | **2026-10-13**: both now prefer the final labelled Award/Order/Conclusion/Finding/Result section; conflict returns unknown; regression tests added. |
 | ~~Certificate path re-adds completed conciliation and wrong condonation~~ | **2026-10-13**: certificate advances the route; s136(1)(b) arbitration and s191(11) Labour Court clocks are separate; practitioner sign-off remains pending. |
 | ~~PDF engine owner decision~~ | **2026-10-13 (D-031)**: retain pypdf; a future pypdfium2 migration requires a corpus-wide parity/error benchmark before code changes. |
+| ~~Real-corpus outcome labels stale after decisive-section fix~~ | **2026-10-13**: restored a verified pre-run backup after missing antiword caused collateral changes, then re-tagged all 12 adjudicative documents from preserved text; 2 outcomes and 1 remedy became honestly unknown, with 4 confidence recalculations. FTS and coverage rebuilt. |
+| ~~Broken virtual-environment directories~~ | **2026-10-13**: both `.venv-broken-*` directories removed recoverably via the Windows Recycle Bin; working `.venv` re-verified. |
 | ~~Bargaining councils are candidates only~~ | **2026-09-18**: MIBCO, NBCRFLI, BCCEI registered after individual robots checks; MEIBC rejected 2026-09-20 |
 | ~~No OCR path~~ | **2026-09-18**: tesseract or rapidocr via `parse --ocr`; sidecars per D-014 |
 | ~~`query_terms` unused~~ | **2026-09-17**: dropped; gov.za ignores `?search=` |
