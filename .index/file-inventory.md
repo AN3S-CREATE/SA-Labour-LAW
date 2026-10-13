@@ -4,12 +4,14 @@ Root: `sa_labour_corpus/`. All paths relative to it. Status values: Active,
 Deprecated, Dead, Experimental, Generated.
 
 Last refreshed: 2026-10-13 (Git/CI baseline, legal deadline and outcome fixes,
-dead adapter removal, install profiles and audit-log rotation).
+dead adapter removal, install profiles, audit-log rotation and remote-history
+integration).
 
 ## Project root (one level above `sa_labour_corpus/`)
 
 | Path | Purpose | Status |
 |---|---|---|
+| `README.md` | Repository title/landing stub preserved from the pre-existing GitHub initial commit | Active |
 | `.gitignore` | Excludes corpus bodies, logs/reports, virtual environments, caches, build outputs and the superseded pre-Git snapshot | Active |
 | `.github/workflows/ci.yml` | Python 3.11/3.13 gate: Ruff, mypy, pytest, golden review sheet and offline fixture smoke | Active |
 | `REPO_ANALYSIS_MEMORY.md` | Working state of the multi-session investigation | Active |
