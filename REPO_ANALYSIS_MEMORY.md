@@ -13,10 +13,11 @@ path were removed (D-030); pypdf retained pending a parity benchmark (D-031);
 supersede wording made explicitly manual (D-032). All 12 adjudicative records
 were re-tagged from their preserved text, changing 7 records; all 397 records
 were re-indexed and COVERAGE.md regenerated. Mypy is clean across 72 source
-files. Acceptance is 10/11 because the newly rotated run history intentionally
-contains no fabricated conditional-request evidence. Automated golden-case QA
-is complete; practitioner sign-off, an identified live crawl, and the intended
-Git remote/hosted CI remain external checkpoints.
+files. An identified `bc_nbcrfli` run then recorded one genuine conditional
+304, zero repeat 200 downloads and zero document bytes, taking acceptance to
+11/11. The operator-confirmed GitHub remote is integrated and hosted Python
+3.11/3.13 CI run 38428505021 passed. Automated golden-case QA is complete;
+independent practitioner sign-off remains the only release checkpoint.
 
 **2026-10-09: Holistic review COMPLETE; corpus re-parsed.** 45 of 72 review
 findings closed (40 distinct defects) plus 15 found while fixing; decisions
@@ -329,6 +330,13 @@ bounded pagination; `query_terms` was dropped as unworkable.
   `BadZipFile` and ended a run. Parse failures are now isolated per document.
 
 ## Session Log
+
+- [2026-10-13] Integrated the pre-existing GitHub initial commit without
+  rewriting history, pushed `main` to `AN3S-CREATE/SA-Labour-LAW`, and verified
+  hosted CI run 38428505021 passed. A one-document-cap identified crawl of
+  `bc_nbcrfli` with the operator-supplied contact produced one genuine 304,
+  zero repeat 200 downloads and zero transferred document bytes; acceptance is
+  now 11/11. Pinned checkout/setup-python to the reviewed v4/v5 tag SHAs.
 
 - [2026-10-13] Completed the safe outcome-label data refresh. A full 397-file
   parse exposed missing `antiword` in the new environment and would have

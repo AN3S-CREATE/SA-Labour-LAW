@@ -42,7 +42,6 @@ retag; evidence in the refresh log and `docs/optimisation-roadmap.md`).
 | Robots-driven trips share the `http_error` gap kind | `robots_oversize`, `crawl_delay`, `retry_after` trips are `http_error` gaps; only per-URL `RobotsDisallowed` is `robots_disallow` | Low (reporting) | Backlog | Key the gap kind on `fetcher.tripped_hosts[host]` if COVERAGE.md should group them |
 | CCMA engine reports back-off trips as policy refusals (integration review, 2026-10-09) | `http.py` now trips a host for a Crawl-delay or Retry-After beyond 900 s (D-025). `ccma/troubleshoot.classify_exception` maps every `HostTripped` to `POLICY_BLOCK` (not retryable), and `_robots_preflight` / `report._next_actions` then say "robots.txt refused ... set `enabled: false`" even though robots permits the path | Low: wrong operator advice, no wrong fetch; CCMA source is disabled today | Next Sprint | A `HostBackoff(HostTripped)` subclass for the delay/Retry-After trips, mapped to a retryable class and to "retry a later run" wording |
 | CCMA harvest raises the shared limiter's global pace | `ccma/harvest.py:165-166` raises `limiter.min/max_delay` for every host when a slower source is added (never lowers; conservative) | Low | Backlog | Use `RateLimiter.set_host_delay` |
-| Acceptance C5 has no post-rotation observation yet | Historical RUN.jsonl was archived; the new log currently contains zero crawl runs, zero repeat 200s and zero 304s | Evidence gap, not a product failure | Next live run | Run one identified crawl with the operator's valid contact address, then rerun the audit; do not manufacture evidence |
 
 ## Resolved
 
@@ -56,6 +55,7 @@ retag; evidence in the refresh log and `docs/optimisation-roadmap.md`).
 | ~~PDF engine owner decision~~ | **2026-10-13 (D-031)**: retain pypdf; a future pypdfium2 migration requires a corpus-wide parity/error benchmark before code changes. |
 | ~~Real-corpus outcome labels stale after decisive-section fix~~ | **2026-10-13**: restored a verified pre-run backup after missing antiword caused collateral changes, then re-tagged all 12 adjudicative documents from preserved text; 2 outcomes and 1 remedy became honestly unknown, with 4 confidence recalculations. FTS and coverage rebuilt. |
 | ~~Broken virtual-environment directories~~ | **2026-10-13**: both `.venv-broken-*` directories removed recoverably via the Windows Recycle Bin; working `.venv` re-verified. |
+| ~~Acceptance C5 lacked post-rotation evidence~~ | **2026-10-13**: identified `bc_nbcrfli` crawl recorded one genuine 304, zero repeat 200 downloads and zero document bytes transferred; acceptance audit now passes 11/11. |
 | ~~Bargaining councils are candidates only~~ | **2026-09-18**: MIBCO, NBCRFLI, BCCEI registered after individual robots checks; MEIBC rejected 2026-09-20 |
 | ~~No OCR path~~ | **2026-09-18**: tesseract or rapidocr via `parse --ocr`; sidecars per D-014 |
 | ~~`query_terms` unused~~ | **2026-09-17**: dropped; gov.za ignores `?search=` |

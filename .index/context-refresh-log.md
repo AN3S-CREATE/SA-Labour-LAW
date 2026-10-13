@@ -467,4 +467,17 @@ Regenerated, and `search` now warns when the index predates the corpus (D-018).
 - External gates: practitioner signature, valid crawler contact/live run, and
   operator-confirmed Git remote plus hosted CI.
 
+## 2026-10-13 — Remote integration and acceptance closure
+
+- Added operator-confirmed remote `AN3S-CREATE/SA-Labour-LAW`, fetched its
+  unrelated two-line initial commit, and merged the histories without force.
+- Pushed `main`; hosted Python 3.11/3.13 CI run 38428505021 passed.
+- Ran `bc_nbcrfli` with a one-document cap and the operator-supplied contact.
+  Robots allowed the run; the stored PDF returned a genuine conditional 304,
+  with zero repeat 200 downloads, zero document bytes and no gaps/failures.
+- Acceptance audit now passes 11/11 against the newly rotated run history.
+- Pinned `actions/checkout` v4 and `actions/setup-python` v5 to their resolved
+  commit SHAs, retaining major-version comments for reviewed updates.
+- Practitioner sign-off of the 30 golden cases remains the sole release gate.
+
 ---

@@ -13,7 +13,7 @@ controls to gain speed.
 | Performance | Add mandatory-literal prefilters to tagger regexes | Hundreds of full-text scans dominate parse CPU | Derive safe literal prefixes, skip impossible regexes, and prove identical spans on the corpus | Next Sprint | Planned |
 | Security | Revalidate cached AIA chains and narrow TLS repair triggers | A cached intermediate must not outlive current trust decisions | Re-run issuer/signature/root checks on cache hit; clear partial-chain flags unless required; add forged-cache tests | Next Sprint | Planned |
 | Security | Keep browser automation absent | Browser fallback could bypass crawler policy and rate limits | Preserve compile/test checks that no Playwright/browser path is reintroduced | Do Now | Completed (D-030) |
-| Security | Pin GitHub Actions to reviewed immutable SHAs | Floating action tags increase supply-chain exposure | Replace `@v4`/`@v5` after the first successful hosted run; record update procedure | Next Sprint | Blocked until remote/first CI run |
+| Security | Pin GitHub Actions to reviewed immutable SHAs | Floating action tags increase supply-chain exposure | Resolve the reviewed major tags to commit SHAs and retain version comments for updates | Next Sprint | Completed after hosted run 38428505021 |
 | Bundle / Build | Keep core, OCR and contributor profiles separate | Most users do not need OCR models or development tools | Maintain `.[ocr]`, `.[test,lint]`, and the full combined profile; test each profile in CI periodically | Do Now | Completed |
 | Bundle / Build | Benchmark pypdfium2 before any PDF-engine migration | Speed alone does not prove text/error parity | Compare every held PDF for text, page count, status, metadata and failure mode; retain pypdf unless parity is demonstrated | Backlog | Decision recorded (D-031) |
 | Architecture | Add schema migrations and minimum-reader versions | Read-only consumers currently fail opaquely on stale SQLite schemas | Introduce `PRAGMA user_version`, ordered migrations and `open_ro(min_version)` diagnostics | Next Sprint | Planned |
@@ -29,10 +29,11 @@ controls to gain speed.
 Before describing the Navigator as legally reviewed or the build as remotely
 green, all of these must be evidenced:
 
-1. A named qualified South African labour-law practitioner signs the 30-case
-   review sheet, with corrections incorporated and re-tested.
-2. A fresh identified-crawler run records genuine resume evidence in the newly
-   rotated `RUN.jsonl`; acceptance criterion 5 must not be manufactured.
-3. The repository has an operator-confirmed remote, both local commits are
-   pushed, and Python 3.11/3.13 GitHub Actions runs pass.
+1. **Pending:** a named qualified South African labour-law practitioner signs
+   the 30-case review sheet, with corrections incorporated and re-tested.
+2. **Completed 2026-10-13:** an identified `bc_nbcrfli` crawl using the
+   operator-supplied contact recorded one genuine conditional 304, zero repeat
+   200 downloads and zero transferred document bytes; acceptance is 11/11.
+3. **Completed 2026-10-13:** the operator-confirmed GitHub remote contains the
+   merged history and Python 3.11/3.13 run 38428505021 passed.
 

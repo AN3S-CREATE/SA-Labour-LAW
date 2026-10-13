@@ -13,7 +13,7 @@ integration).
 |---|---|---|
 | `README.md` | Repository title/landing stub preserved from the pre-existing GitHub initial commit | Active |
 | `.gitignore` | Excludes corpus bodies, logs/reports, virtual environments, caches, build outputs and the superseded pre-Git snapshot | Active |
-| `.github/workflows/ci.yml` | Python 3.11/3.13 gate: Ruff, mypy, pytest, golden review sheet and offline fixture smoke | Active |
+| `.github/workflows/ci.yml` | Python 3.11/3.13 gate: Ruff, mypy, pytest, golden review sheet and offline fixture smoke; third-party actions pinned to reviewed commit SHAs | Active |
 | `REPO_ANALYSIS_MEMORY.md` | Working state of the multi-session investigation | Active |
 | `analysis_logs/review-2026-10-09-findings.{md,json}` | Full evidence of the 2026-10-09 review: 72 findings with verifier reasoning and fix notes | Active (archive) |
 | `analysis_logs/baseline-2026-10-09/` | Pre-change copy of `sa_labour_corpus` source/tests/docs/config, `.index/` and the memory file (128 files, 1 MB). The only rollback point until git exists | Active (archive) |
